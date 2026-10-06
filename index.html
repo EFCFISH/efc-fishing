@@ -14,12 +14,30 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 .energy-bar{height:12px;background:#333;border-radius:10px;overflow:hidden;margin-top:8px}
 .energy-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);width:100%;transition:0.3s}
 .level-box{margin:0 20px 10px 20px;background:#1e2540;border-radius:12px;padding:10px 12px;border:1px solid #333}
-.pond{margin:10px 20px 20px 20px;height:38vh;background:radial-gradient(circle at 50% 30%,#1a3a5a,#0a1a2a);border-radius:25px;position:relative;display:flex;align-items:center;justify-content:center;border:2px solid #FFD700;cursor:pointer;user-select:none}
-.fish-emoji{font-size:80px;animation:float 2s infinite;transition:transform 0.15s ease;display:inline-block}
+.pond{
+  margin:10px 20px 20px 20px;height:38vh;
+  background:radial-gradient(circle at 50% 20%,#1e4d6b,#0a1a2a 80%);
+  border-radius:25px;position:relative;display:flex;align-items:center;justify-content:center;
+  border:2px solid #FFD700;cursor:pointer;user-select:none;overflow:hidden
+}
+/* পানির ঢেউ এর দাগ */
+.pond::before{
+  content:"";position:absolute;width:200%;height:200%;top:-50%;left:-50%;
+  background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-size:22px 22px; animation:waterMove 8s linear infinite; pointer-events:none;
+}
+@keyframes waterMove{0%{transform:translate(0,0)}100%{transform:translate(22px,22px)}}
+.fish-emoji{font-size:80px;animation:float 2s infinite;transition:transform 0.15s ease;display:inline-block;z-index:2}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
-.tap-text{position:absolute;bottom:20px;background:rgba(0,0,0,0.7);padding:8px 18px;border-radius:20px;font-weight:bold;color:#FFD700}
+.tap-text{position:absolute;bottom:20px;background:rgba(0,0,0,0.7);padding:8px 18px;border-radius:20px;font-weight:bold;color:#FFD700;z-index:3}
 .coin-pop{position:absolute;color:#FFD700;font-weight:bold;font-size:22px;animation:pop 0.8s forwards;pointer-events:none;z-index:9999}
 @keyframes pop{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-80px) scale(1.5);opacity:0}}
+/* === NEW WATER EFFECTS === */
+.ripple{position:absolute;border:2px solid rgba(255,215,0,0.7);border-radius:50%;transform:translate(-50%,-50%);animation:rippleAnim 0.8s ease-out forwards;pointer-events:none;z-index:1}
+@keyframes rippleAnim{0%{width:0;height:0;opacity:1}100%{width:250px;height:250px;opacity:0}}
+.bubble{position:absolute;bottom:5px;width:8px;height:8px;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(100,200,255,0.4));border-radius:50%;animation:bubbleUp linear forwards;pointer-events:none;z-index:1}
+@keyframes bubbleUp{0%{transform:translateY(0) translateX(0);opacity:0.9}100%{transform:translateY(-38vh) translateX(25px);opacity:0}}
+
 .shop{display:flex;gap:12px;padding:0 20px;margin-top:10px}
 .card{flex:1;background:#1e2540;border:1px solid #FFD700;border-radius:15px;padding:15px;text-align:center}
 .card button{background:#FFD700;border:none;padding:8px 15px;border-radius:10px;font-weight:bold;margin-top:10px;width:100%;cursor:pointer}
@@ -39,14 +57,11 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 </head>
 <body>
 <div id="toast"></div>
-
 <div class="header"><div><b>EFC Fishing Frenzy</b><br><small id="levelText" style="color:#CD7F32;font-weight:bold">🥉 Bronze Fisher</small></div><div class="balance" onclick="showBalance()">💰 <span id="bal">1250</span> EFC</div></div>
-
 <div style="display:flex;justify-content:space-between;align-items:center;margin:0 20px 8px 20px">
 <div id="muteBtn" onclick="toggleMute()" style="background:#1e2540;border:1px solid #FFD700;border-radius:20px;padding:6px 12px;font-size:11px;cursor:pointer">🌊 Sound On</div>
 <div style="font-size:11px;opacity:0.6">Next Level Progress</div>
 </div>
-
 <div class="level-box"><div style="display:flex;justify-content:space-between;font-size:12px"><span id="nextNeed" style="color:#FFD700">...</span></div><div style="height:8px;background:#0a0e1a;border-radius:10px;margin-top:8px;overflow:hidden;border:1px solid #333"><div id="levelProgress" style="height:100%;width:0%;transition:0.5s"></div></div></div>
 <div class="energy-box"><div style="display:flex;justify-content:space-between"><span>⚡ ENERGY</span><span id="energyText">1000/1000</span></div><div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div></div>
 <div class="pond" id="pond"><div class="fish-emoji" id="fish">🎣</div><div class="tap-text">TAP TO FISH!</div></div>
@@ -55,7 +70,6 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 <div class="card" onclick="showLeaderboard()" style="cursor:pointer"><div style="font-size:30px">🏆</div><b>Leaderboard</b><br><small id="miniRank">You: #1</small><div style="text-align:center;margin-top:8px;background:#0a0e1a;padding:10px;border-radius:10px;border:1px solid #333"><div style="font-size:20px;font-weight:bold;color:#FFD700" id="miniBal">0</div><div style="font-size:11px;opacity:0.7" id="miniTier">Bronze Fisher</div></div><small style="color:#FFD700;font-size:10px;margin-top:5px;display:block">Tap to view →</small></div>
 </div>
 <div class="nav"><div id="navLearn" onclick="showQuiz()">📚<br>Learn</div><div id="navFish" class="active" onclick="showFish()">🐟<br>Fish</div><div id="navFriends" onclick="invite()">👥<br>Friends</div><div id="navEarn" onclick="earn()">🎁<br>Earn</div></div>
-
 <div id="refModal"><div class="modal-box"><h3 style="color:#FFD700">👥 Invite Friends</h3><p style="font-size:13px;margin-top:8px;opacity:0.8">Get 500 EFC per friend!</p><input type="text" id="refLinkInput" readonly><button class="btn-copy" onclick="copyRef()">📋 COPY LINK</button><button class="btn-share" onclick="shareRef()">📤 SHARE ON WHATSAPP</button><div style="margin-top:12px;font-size:12px">Referred By: <span id="refByText" style="color:#FFD700">None</span></div><button class="btn-close" onclick="closeRef()">Close</button></div></div>
 <div id="balanceModal"><div class="modal-box"><h3 style="color:#FFD700">💰 Your Wallet</h3><div style="margin:15px 0;background:#0a0e1a;padding:15px;border-radius:12px;border:1px solid #FFD700"><div style="font-size:28px;font-weight:bold;color:#FFD700" id="walletBal">0 EFC</div><div style="font-size:12px;opacity:0.8" id="walletTier">Bronze</div></div><div style="text-align:left;font-size:13px;line-height:24px;background:#151a2d;padding:12px;border-radius:10px"><div>📊 Taps: <span id="totalTaps" style="color:#FFD700">0</span></div><div>⚡ Energy: <span id="walletEnergy" style="color:#FFD700">0</span></div><div>🎯 Next: <span id="walletNext" style="color:#FFD700">0</span></div></div><button class="btn-close" onclick="closeBalance()">Close</button></div></div>
 <div id="leaderModal"><div class="modal-box"><h3 style="color:#FFD700">🏆 Leaderboard</h3><p style="font-size:11px;opacity:0.6;margin-top:4px">Your current ranking</p><div style="margin:15px 0;text-align:left;background:#0a0e1a;border-radius:12px;padding:12px;border:2px solid #FFD700"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:bold" id="myRankText">👤 You (#1)</div><div style="font-size:11px;opacity:0.7" id="myRankTier">🥉 Bronze Fisher</div></div><div style="text-align:right"><div style="font-weight:bold;color:#FFD700;font-size:16px" id="myRankBal">0 EFC</div></div></div></div><div style="background:#151a2d;padding:12px;border-radius:10px;font-size:12px;text-align:center;line-height:22px"><div style="opacity:0.5">🥈 2nd Place — No player yet</div><div style="opacity:0.5">🥉 3rd Place — No player yet</div><div style="margin-top:8px;color:#FFD700;font-size:11px">Invite friends to compete! 👥</div></div><button class="btn-copy" onclick="closeLeaderboard();invite()" style="margin-top:12px">👥 INVITE FRIENDS</button><button class="btn-close" onclick="closeLeaderboard()">Close</button></div></div>
@@ -71,79 +85,40 @@ let maxEnergy=1000;
 const myId=tg.initDataUnsafe.user?.id||Math.floor(Math.random()*900000)+100000;
 const startParam=tg.initDataUnsafe.start_param;
 
-// ===== 100% WORKING SOUND - NO MP3, WEB AUDIO API =====
+// ===== WEB AUDIO SOUND =====
 let isMuted = localStorage.getItem('efc_muted') === 'true';
 let audioCtx = null;
-
-function initAudio(){
-  if(!audioCtx){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if(audioCtx.state === 'suspended') audioCtx.resume();
-}
+function initAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } if(audioCtx.state === 'suspended') audioCtx.resume(); }
 function playBubble(){
-  if(isMuted) return;
-  initAudio();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type='sine';
-  osc.frequency.setValueAtTime(300 + Math.random()*500, audioCtx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime+0.25);
-  gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.25);
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(); osc.stop(audioCtx.currentTime+0.25);
+  if(isMuted) return; initAudio();
+  const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain();
+  osc.type='sine'; osc.frequency.setValueAtTime(300+Math.random()*500,audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80,audioCtx.currentTime+0.25);
+  gain.gain.setValueAtTime(0.6,audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.25);
+  osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+0.25);
 }
 function playSplash(){
-  if(isMuted) return;
-  initAudio();
-  const size = audioCtx.sampleRate*0.15;
-  const buffer = audioCtx.createBuffer(1,size,audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for(let i=0;i<size;i++){ data[i]=(Math.random()*2-1)*Math.pow(1-i/size,2); }
-  const src = audioCtx.createBufferSource();
-  src.buffer=buffer;
-  const filt = audioCtx.createBiquadFilter();
-  filt.type='bandpass'; filt.frequency.value=1200;
-  const gain = audioCtx.createGain();
-  gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.15);
-  src.connect(filt); filt.connect(gain); gain.connect(audioCtx.destination);
-  src.start();
+  if(isMuted) return; initAudio();
+  const size=audioCtx.sampleRate*0.15; const buffer=audioCtx.createBuffer(1,size,audioCtx.sampleRate);
+  const data=buffer.getChannelData(0); for(let i=0;i<size;i++){ data[i]=(Math.random()*2-1)*Math.pow(1-i/size,2); }
+  const src=audioCtx.createBufferSource(); src.buffer=buffer;
+  const filt=audioCtx.createBiquadFilter(); filt.type='bandpass'; filt.frequency.value=1200;
+  const gain=audioCtx.createGain(); gain.gain.setValueAtTime(0.7,audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.15);
+  src.connect(filt); filt.connect(gain); gain.connect(audioCtx.destination); src.start();
 }
 function playRewardSound(){
-  if(isMuted) return;
-  initAudio();
-  [0,0.12,0.24].forEach((d,i)=>{
-    const osc=audioCtx.createOscillator();
-    const gain=audioCtx.createGain();
-    osc.type='sine';
-    osc.frequency.setValueAtTime(500 + i*250, audioCtx.currentTime+d);
-    gain.gain.setValueAtTime(0, audioCtx.currentTime+d);
-    gain.gain.linearRampToValueAtTime(0.6, audioCtx.currentTime+d+0.03);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+d+0.4);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(audioCtx.currentTime+d); osc.stop(audioCtx.currentTime+d+0.4);
-  });
+  if(isMuted) return; initAudio();
+  [0,0.12,0.24].forEach((d,i)=>{ const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain(); osc.type='sine'; osc.frequency.setValueAtTime(500+i*250,audioCtx.currentTime+d); gain.gain.setValueAtTime(0,audioCtx.currentTime+d); gain.gain.linearRampToValueAtTime(0.6,audioCtx.currentTime+d+0.03); gain.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d+0.4); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(audioCtx.currentTime+d); osc.stop(audioCtx.currentTime+d+0.4); });
   if(navigator.vibrate) navigator.vibrate([40,30,60]);
 }
-function toggleMute(){
-  isMuted=!isMuted;
-  localStorage.setItem('efc_muted', isMuted);
-  document.getElementById('muteBtn').innerText = isMuted? "🔇 Muted" : "🌊 Sound On";
-  if(!isMuted) initAudio();
-}
-window.addEventListener('load',()=>{ document.getElementById('muteBtn').innerText = isMuted? "🔇 Muted" : "🌊 Sound On"; });
+function toggleMute(){ isMuted=!isMuted; localStorage.setItem('efc_muted',isMuted); document.getElementById('muteBtn').innerText=isMuted?"🔇 Muted":"🌊 Sound On"; if(!isMuted) initAudio(); }
+window.addEventListener('load',()=>{ document.getElementById('muteBtn').innerText=isMuted?"🔇 Muted":"🌊 Sound On"; });
 
-// Toast & Modal
+// Toast
 function showToast(msg){let t=document.getElementById('toast');t.innerText=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2500);tg.HapticFeedback.impactOccurred('light');}
 function showAppModal(title,text){document.getElementById('appModalTitle').innerText=title;document.getElementById('appModalText').innerText=text;document.getElementById('appModal').style.display='flex';}
 function closeAppModal(){document.getElementById('appModal').style.display='none';}
-
-if(startParam&&!localStorage.getItem('efc_ref_claimed')&&startParam!=myId){
-  balance+=500;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_ref_claimed','true');localStorage.setItem('efc_referred_by',startParam);
-  setTimeout(()=>{ playRewardSound(); showAppModal('Welcome Bonus! 🎉','Welcome via Referral! +500 EFC Bonus!');document.getElementById('bal').innerText=balance;updateLevel();},800);
-}
+if(startParam&&!localStorage.getItem('efc_ref_claimed')&&startParam!=myId){ balance+=500;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_ref_claimed','true');localStorage.setItem('efc_referred_by',startParam); setTimeout(()=>{ playRewardSound(); showAppModal('Welcome Bonus! 🎉','Welcome via Referral! +500 EFC Bonus!');document.getElementById('bal').innerText=balance;updateLevel();},800); }
 document.getElementById('bal').innerText=balance;
 function updateEnergy(){document.getElementById('energyText').innerText=energy+'/'+maxEnergy;document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';localStorage.setItem('efc_en',energy);}
 function updateLevel(){let el=document.getElementById('levelText');let pBar=document.getElementById('levelProgress');let needEl=document.getElementById('nextNeed');if(!el)return;let name="",color="",icon="",need=0,total=1,cur=0;if(balance<100000){name="Bronze Fisher";color="#CD7F32";icon="🥉";need=100000-balance;total=100000;cur=balance;}else if(balance<1000000){name="Silver Fisher";color="#C0C0C0";icon="🥈";need=1000000-balance;total=900000;cur=balance-100000;}else if(balance<10000000){name="Gold Fisher";color="#FFD700";icon="🥇";need=10000000-balance;total=9000000;cur=balance-1000000;}else if(balance<50000000){name="Platinum Fisher";color="#00BFFF";icon="💎";need=50000000-balance;total=40000000;cur=balance-10000000;}else if(balance<200000000){name="Diamond Fisher";color="#B9F2FF";icon="👑";need=200000000-balance;total=150000000;cur=balance-50000000;}else if(balance<1000000000){name="Legendary Fisher";color="#FF4500";icon="🔥";need=1000000000-balance;total=800000000;cur=balance-200000000;}else{name="MYTHIC GOD";color="#FF00FF";icon="🐉";need=0;total=1;cur=1;}el.innerHTML=icon+" "+name;el.style.color=color;if(pBar&&needEl){let pct=Math.min(100,(cur/total*100));pBar.style.width=pct.toFixed(2)+"%";pBar.style.background="linear-gradient(90deg, "+color+", #fff)";needEl.innerText=need>0?need.toLocaleString()+" EFC to next":"MAX LEVEL!";}document.getElementById('miniBal').innerText=balance.toLocaleString()+" EFC";document.getElementById('miniTier').innerText=icon+" "+name;document.getElementById('miniTier').style.color=color;document.getElementById('myRankTier').innerText=icon+" "+name;let rank=balance>50000?'#1':balance>10000?'#3':balance>1000?'#8':'#15';document.getElementById('miniRank').innerText='You: '+rank;document.getElementById('myRankText').innerText='👤 You ('+rank+')';document.getElementById('myRankBal').innerText=balance.toLocaleString()+" EFC";}
@@ -155,44 +130,40 @@ document.getElementById('pond').addEventListener('click',tap);
 document.getElementById('pond').addEventListener('touchstart',function(e){e.preventDefault();tap(e);},{passive:false});
 function tap(e){
   if(energy<=0){showToast('⚡ No energy! Invite friends!');return;}
-  playBubble();
-  if(Math.random()>0.6) setTimeout(playSplash,70);
+  playBubble(); if(Math.random()>0.6) setTimeout(playSplash,70);
+
+  // ===== NEW WATER VISUAL EFFECT =====
+  const pond=document.getElementById('pond'); const rect=pond.getBoundingClientRect();
+  let x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  let y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  let ripple=document.createElement('div'); ripple.className='ripple'; ripple.style.left=x+'px'; ripple.style.top=y+'px'; pond.appendChild(ripple); setTimeout(()=>ripple.remove(),800);
+  for(let i=0;i<5;i++){
+    setTimeout(()=>{
+      let b=document.createElement('div'); b.className='bubble';
+      b.style.left=(x+(Math.random()*50-25))+'px';
+      b.style.width=b.style.height=(5+Math.random()*10)+'px';
+      b.style.animationDuration=(1.2+Math.random()*1.2)+'s';
+      pond.appendChild(b); setTimeout(()=>b.remove(),2200);
+    }, i*90);
+  }
+
   energy--;balance+=perTap;if(Math.random()>0.7){balance+=2; setTimeout(playSplash,100);}
-  let taps=parseInt(localStorage.getItem('efc_taps')||'0')+1;localStorage.setItem('efc_taps',taps);localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_en',energy);document.getElementById('bal').innerText=balance;updateEnergy();updateLevel();fishScale+=0.15;if(fishScale>2.2)fishScale=2.2;fishEl.style.transform='scale('+fishScale+')';clearTimeout(fishEl.shrinkTimer);fishEl.shrinkTimer=setTimeout(function(){fishScale=1;fishEl.style.transform='scale(1)';},700);let x=e.touches?e.touches[0].clientX:e.clientX;let y=e.touches?e.touches[0].clientY:e.clientY;let el2=document.createElement('div');el2.className='coin-pop';el2.style.left=(x-20)+'px';el2.style.top=(y-30)+'px';el2.innerText='+'+perTap+' EFC';document.body.appendChild(el2);setTimeout(function(){el2.remove();},800);tg.HapticFeedback.impactOccurred('light');
+  let taps=parseInt(localStorage.getItem('efc_taps')||'0')+1;localStorage.setItem('efc_taps',taps);localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_en',energy);document.getElementById('bal').innerText=balance;updateEnergy();updateLevel();fishScale+=0.15;if(fishScale>2.2)fishScale=2.2;fishEl.style.transform='scale('+fishScale+')';clearTimeout(fishEl.shrinkTimer);fishEl.shrinkTimer=setTimeout(function(){fishScale=1;fishEl.style.transform='scale(1)';},700);let cx=e.touches?e.touches[0].clientX:e.clientX;let cy=e.touches?e.touches[0].clientY:e.clientY;let el2=document.createElement('div');el2.className='coin-pop';el2.style.left=(cx-20)+'px';el2.style.top=(cy-30)+'px';el2.innerText='+'+perTap+' EFC';document.body.appendChild(el2);setTimeout(function(){el2.remove();},800);tg.HapticFeedback.impactOccurred('light');
 }
 function showBalance(){document.getElementById('walletBal').innerText=balance.toLocaleString()+' EFC';document.getElementById('walletTier').innerText=document.getElementById('levelText').innerText;document.getElementById('walletEnergy').innerText=energy+'/'+maxEnergy;document.getElementById('walletNext').innerText=document.getElementById('nextNeed').innerText;document.getElementById('totalTaps').innerText=localStorage.getItem('efc_taps')||'0';document.getElementById('balanceModal').style.display='flex';}
 function closeBalance(){document.getElementById('balanceModal').style.display='none';}
 function showLeaderboard(){updateLevel();document.getElementById('leaderModal').style.display='flex';}
 function closeLeaderboard(){document.getElementById('leaderModal').style.display='none';}
-function buyRod(){
-  if(balance>=500){
-    playRewardSound();
-    balance-=500;perTap=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_per',perTap);document.getElementById('bal').innerText=balance;updateLevel();showAppModal('Unlocked! 🎣','Iron Rod Unlocked! Now 2x Income!');
-  }else showToast('❌ Need 500 EFC!');
-}
+function buyRod(){ if(balance>=500){ playRewardSound(); balance-=500;perTap=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_per',perTap);document.getElementById('bal').innerText=balance;updateLevel();showAppModal('Unlocked! 🎣','Iron Rod Unlocked! Now 2x Income!'); }else showToast('❌ Need 500 EFC!'); }
 let currentQuiz=null;
 function showQuiz(){setActive('navLearn');const quizList=[{q:"Opposite of Hot?",o1:"Cold",o2:"Hot",ans:1},{q:"Plural of Book?",o1:"Books",o2:"Bookes",ans:1},{q:"Sun rises in ___?",o1:"East",o2:"West",ans:1},{q:"What is 2 + 2?",o1:"4",o2:"5",ans:1},{q:"Letters in Alphabet?",o1:"26",o2:"24",ans:1},{q:"Opposite of Big?",o1:"Small",o2:"Large",ans:1}];const today=new Date().toDateString();let lastDate=localStorage.getItem('efc_quiz_date');let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');if(lastDate!==today){count=0;localStorage.setItem('efc_quiz_date',today);localStorage.setItem('efc_quiz_count','0');}if(count>=10){showAppModal('Daily Limit!','Limit 10/10 done! Come back tomorrow!');setActive('navFish');return;}currentQuiz=quizList[Math.floor(Math.random()*quizList.length)];document.getElementById('quizQ').innerText=currentQuiz.q;document.getElementById('qOpt1').innerText='1. '+currentQuiz.o1;document.getElementById('qOpt2').innerText='2. '+currentQuiz.o2;document.getElementById('quizCount').innerText='Question '+(count+1)+'/10 Today';document.getElementById('quizModal').style.display='flex';}
-function answerQuiz(choice){
-  let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');let today=new Date().toDateString();
-  if(choice==currentQuiz.ans){
-    playRewardSound();
-    balance+=50;count++;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_quiz_count',count);localStorage.setItem('efc_quiz_date',today);updateLevel();closeQuizModal();showToast('✅ Correct! +50 EFC ('+count+'/10)');
-  }else{
-    closeQuizModal();showToast('❌ Wrong! Try next!');
-  }setActive('navFish');
-}
+function answerQuiz(choice){ let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');let today=new Date().toDateString(); if(choice==currentQuiz.ans){ playRewardSound(); balance+=50;count++;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_quiz_count',count);localStorage.setItem('efc_quiz_date',today);updateLevel();closeQuizModal();showToast('✅ Correct! +50 EFC ('+count+'/10)'); }else{ closeQuizModal();showToast('❌ Wrong! Try next!'); }setActive('navFish'); }
 function closeQuizModal(){document.getElementById('quizModal').style.display='none';}
 function invite(){setActive('navFriends');let link='https://t.me/EFC_FISH_BOT?start='+myId;document.getElementById('refLinkInput').value=link;document.getElementById('refByText').innerText=localStorage.getItem('efc_referred_by')||'None';document.getElementById('refModal').style.display='flex';}
 function closeRef(){document.getElementById('refModal').style.display='none';setActive('navFish');}
 function copyRef(){navigator.clipboard.writeText(document.getElementById('refLinkInput').value).then(()=>showToast('✅ Link Copied!'));}
 function shareRef(){let link=document.getElementById('refLinkInput').value;window.open('https://wa.me/?text='+encodeURIComponent('🎣 Join EFC Fishing & Earn! '+link),'_blank');}
-function earn(){
-  setActive('navEarn');
-  let last=localStorage.getItem('efc_daily_date');let today=new Date().toDateString();
-  if(last===today){showAppModal('Already Claimed! 🎁','You already claimed today! Come back tomorrow!');setActive('navFish');return;}
-  playRewardSound();
-  balance+=100;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_daily_date',today);updateLevel();showAppModal('Daily Bonus! 🎁','Daily +100 EFC Claimed!');setActive('navFish');
-}
+function earn(){ setActive('navEarn'); let last=localStorage.getItem('efc_daily_date');let today=new Date().toDateString(); if(last===today){showAppModal('Already Claimed! 🎁','You already claimed today! Come back tomorrow!');setActive('navFish');return;} playRewardSound(); balance+=100;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_daily_date',today);updateLevel();showAppModal('Daily Bonus! 🎁','Daily +100 EFC Claimed!');setActive('navFish'); }
 setInterval(function(){if(energy<maxEnergy){energy++;updateEnergy();}},3000);
 </script>
 </body>
