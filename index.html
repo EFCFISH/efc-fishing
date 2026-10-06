@@ -9,7 +9,8 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
 body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflow-y:auto}
 .header{padding:15px;display:flex;justify-content:space-between;align-items:center;background:#151a2d}
-.balance{background:linear-gradient(90deg,#FFD700,#FFA500);padding:10px 20px;border-radius:20px;color:#000;font-weight:bold}
+.balance{background:linear-gradient(90deg,#FFD700,#FFA500);padding:10px 20px;border-radius:20px;color:#000;font-weight:bold;cursor:pointer;transition:0.2s}
+.balance:active{transform:scale(0.95)}
 .energy-box{margin:10px 20px;background:#1e2540;border-radius:15px;padding:12px}
 .energy-bar{height:12px;background:#333;border-radius:10px;overflow:hidden;margin-top:8px}
 .energy-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);width:100%;transition:0.3s}
@@ -26,7 +27,7 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 .nav{position:fixed;bottom:0;width:100%;background:#151a2d;display:flex;justify-content:space-around;padding:12px 0;border-top:1px solid #333;z-index:999}
 .nav div{text-align:center;opacity:0.6;cursor:pointer}
 .nav div.active{opacity:1;color:#FFD700}
-#refModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px}
+#refModal,#balanceModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px}
 .modal-box{background:#1e2540;border:2px solid #FFD700;border-radius:20px;padding:20px;width:100%;max-width:380px;text-align:center}
 .modal-box input{width:100%;padding:12px;border-radius:10px;border:1px solid #FFD700;background:#0a0e1a;color:#FFD700;margin:12px 0;text-align:center;font-size:13px}
 .btn-copy{background:#FFD700;color:#000;border:none;padding:12px;width:100%;border-radius:12px;font-weight:bold;margin-top:8px;cursor:pointer}
@@ -35,7 +36,7 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 </style>
 </head>
 <body>
-<div class="header"><div><b>EFC Fishing Frenzy</b><br><small id="levelText" style="color:#CD7F32;font-weight:bold">🥉 Bronze Fisher</small></div><div class="balance">💰 <span id="bal">1250</span> EFC</div></div>
+<div class="header"><div><b>EFC Fishing Frenzy</b><br><small id="levelText" style="color:#CD7F32;font-weight:bold">🥉 Bronze Fisher</small></div><div class="balance" onclick="showBalance()">💰 <span id="bal">1250</span> EFC</div></div>
 
 <div class="level-box"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Next Level Progress</span><span id="nextNeed" style="color:#FFD700">...</span></div><div style="height:8px;background:#0a0e1a;border-radius:10px;margin-top:8px;overflow:hidden;border:1px solid #333"><div id="levelProgress" style="height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);width:0%;transition:0.5s"></div></div></div>
 
@@ -49,6 +50,8 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 
 <div id="refModal"><div class="modal-box"><h3 style="color:#FFD700">👥 Invite Friends</h3><p style="font-size:13px;margin-top:8px;opacity:0.8">Get 500 EFC per friend!</p><input type="text" id="refLinkInput" readonly><button class="btn-copy" onclick="copyRef()">📋 COPY LINK</button><button class="btn-share" onclick="shareRef()">📤 SHARE ON WHATSAPP</button><div style="margin-top:12px;font-size:12px">Referred By: <span id="refByText" style="color:#FFD700">None</span></div><button class="btn-close" onclick="closeRef()">Close</button></div></div>
 
+<div id="balanceModal"><div class="modal-box"><h3 style="color:#FFD700">💰 Your Wallet</h3><div style="margin:15px 0;background:#0a0e1a;padding:15px;border-radius:12px;border:1px solid #FFD700"><div style="font-size:30px;font-weight:bold;color:#FFD700" id="walletBal">1494 EFC</div><div style="font-size:12px;opacity:0.8;margin-top:5px" id="walletTier">🥉 Bronze Fisher</div></div><div style="text-align:left;font-size:13px;line-height:24px;background:#151a2d;padding:12px;border-radius:10px"><div>📊 Total Taps: <span id="totalTaps" style="color:#FFD700">0</span></div><div>⚡ Energy: <span id="walletEnergy" style="color:#FFD700">1000/1000</span></div><div>🎯 Next: <span id="walletNext" style="color:#FFD700">98,506 EFC</span></div><div>🔗 Referrals: <span id="walletRef" style="color:#FFD700">0</span></div></div><div style="margin-top:15px"><button class="btn-copy" onclick="alert('Withdraw available at 100K EFC! Keep Fishing! 🎣')">💸 WITHDRAW (Soon)</button><button class="btn-close" onclick="closeBalance()">Close</button></div></div></div>
+
 <script>
 let tg=window.Telegram.WebApp;tg.expand();
 let balance=parseInt(localStorage.getItem('efc_bal')||'1250');
@@ -58,57 +61,35 @@ let maxEnergy=1000;
 const myId=tg.initDataUnsafe.user?.id||Math.floor(Math.random()*900000)+100000;
 const startParam=tg.initDataUnsafe.start_param;
 if(startParam&&!localStorage.getItem('efc_ref_claimed')&&startParam!=myId){balance+=500;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_ref_claimed','true');localStorage.setItem('efc_referred_by',startParam);setTimeout(()=>{alert('Welcome via Referral! +500 EFC Bonus!');document.getElementById('bal').innerText=balance;updateLevel();},800);}
-
 document.getElementById('bal').innerText=balance;
-
 function updateEnergy(){document.getElementById('energyText').innerText=energy+'/'+maxEnergy;document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';localStorage.setItem('efc_en',energy);}
-
 function updateLevel(){
   let el=document.getElementById('levelText');
   let pBar=document.getElementById('levelProgress');
   let needEl=document.getElementById('nextNeed');
   if(!el) return;
   let name="", color="", icon="", need=0, total=1, cur=0;
-
-  if(balance < 100000){
-    name="Bronze Fisher"; color="#CD7F32"; icon="🥉"; need=100000-balance; total=100000; cur=balance;
-  }else if(balance < 1000000){
-    name="Silver Fisher"; color="#C0C0C0"; icon="🥈"; need=1000000-balance; total=900000; cur=balance-100000;
-  }else if(balance < 10000000){
-    name="Gold Fisher"; color="#FFD700"; icon="🥇"; need=10000000-balance; total=9000000; cur=balance-1000000;
-  }else if(balance < 50000000){
-    name="Platinum Fisher"; color="#00BFFF"; icon="💎"; need=50000000-balance; total=40000000; cur=balance-10000000;
-  }else if(balance < 200000000){
-    name="Diamond Fisher"; color="#B9F2FF"; icon="👑"; need=200000000-balance; total=150000000; cur=balance-50000000;
-  }else if(balance < 1000000000){
-    name="Legendary Fisher"; color="#FF4500"; icon="🔥"; need=1000000000-balance; total=800000000; cur=balance-200000000;
-  }else{
-    name="MYTHIC GOD"; color="#FF00FF"; icon="🐉"; need=0; total=1; cur=1;
-  }
-  el.innerHTML=`${icon} ${name}`;
-  el.style.color=color;
-  el.style.textShadow=`0 0 15px ${color}`;
-  if(pBar && needEl){
-    let pct=Math.min(100,(cur/total*100));
-    pBar.style.width=pct.toFixed(2)+"%";
-    pBar.style.background=`linear-gradient(90deg, ${color}, #fff)`;
-    needEl.innerText = need>0 ? `${need.toLocaleString()} EFC to next` : "MAX LEVEL!";
-  }
+  if(balance < 100000){name="Bronze Fisher"; color="#CD7F32"; icon="🥉"; need=100000-balance; total=100000; cur=balance;}
+  else if(balance < 1000000){name="Silver Fisher"; color="#C0C0C0"; icon="🥈"; need=1000000-balance; total=900000; cur=balance-100000;}
+  else if(balance < 10000000){name="Gold Fisher"; color="#FFD700"; icon="🥇"; need=10000000-balance; total=9000000; cur=balance-1000000;}
+  else if(balance < 50000000){name="Platinum Fisher"; color="#00BFFF"; icon="💎"; need=50000000-balance; total=40000000; cur=balance-10000000;}
+  else if(balance < 200000000){name="Diamond Fisher"; color="#B9F2FF"; icon="👑"; need=200000000-balance; total=150000000; cur=balance-50000000;}
+  else if(balance < 1000000000){name="Legendary Fisher"; color="#FF4500"; icon="🔥"; need=1000000000-balance; total=800000000; cur=balance-200000000;}
+  else{name="MYTHIC GOD"; color="#FF00FF"; icon="🐉"; need=0; total=1; cur=1;}
+  el.innerHTML=`${icon} ${name}`; el.style.color=color; el.style.textShadow=`0 0 15px ${color}`;
+  if(pBar && needEl){let pct=Math.min(100,(cur/total*100)); pBar.style.width=pct.toFixed(2)+"%"; pBar.style.background=`linear-gradient(90deg, ${color}, #fff)`; needEl.innerText = need>0 ? `${need.toLocaleString()} EFC to next` : "MAX LEVEL!";}
   localStorage.setItem('efc_tier',name);
 }
-updateEnergy();
-updateLevel();
-
+updateEnergy(); updateLevel();
 function setActive(id){document.querySelectorAll('.nav div').forEach(d=>d.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function showFish(){setActive('navFish');window.scrollTo({top:0,behavior:'smooth'});let f=document.getElementById('fish');f.style.transform='scale(1.6)';setTimeout(()=>{f.style.transform='scale(1)'},300);tg.HapticFeedback.impactOccurred('light');}
-
 let fishScale=1;let fishEl=document.getElementById('fish');
 document.getElementById('pond').addEventListener('click',tap);
 document.getElementById('pond').addEventListener('touchstart',(e)=>{e.preventDefault();tap(e);},{passive:false});
-
 function tap(e){
   if(energy<=0){alert('No energy left! Invite friends!');return;}
   energy--; balance+=perTap; if(Math.random()>0.7) balance+=2;
+  let taps=parseInt(localStorage.getItem('efc_taps')||'0')+1; localStorage.setItem('efc_taps',taps);
   localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_en',energy);
   document.getElementById('bal').innerText=balance; updateEnergy(); updateLevel();
   fishScale+=0.15; if(fishScale>2.2) fishScale=2.2; fishEl.style.transform='scale('+fishScale+')';
@@ -118,7 +99,17 @@ function tap(e){
   document.body.appendChild(el2); setTimeout(()=>el2.remove(),800);
   tg.HapticFeedback.impactOccurred('light');
 }
-
+function showBalance(){
+  document.getElementById('walletBal').innerText = balance.toLocaleString() + ' EFC';
+  document.getElementById('walletTier').innerText = document.getElementById('levelText').innerText;
+  document.getElementById('walletEnergy').innerText = energy + '/' + maxEnergy;
+  document.getElementById('walletNext').innerText = document.getElementById('nextNeed').innerText;
+  document.getElementById('totalTaps').innerText = localStorage.getItem('efc_taps') || '0';
+  document.getElementById('walletRef').innerText = localStorage.getItem('efc_ref_count') || '0';
+  document.getElementById('balanceModal').style.display = 'flex';
+  tg.HapticFeedback.impactOccurred('medium');
+}
+function closeBalance(){document.getElementById('balanceModal').style.display='none';}
 function buyRod(){if(balance>=500){balance-=500;perTap=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_per',perTap);document.getElementById('bal').innerText=balance;updateLevel();alert('Iron Rod Unlocked! Now 2x Income!');}else alert('Need 500 EFC!');}
 function showQuiz(){setActive('navLearn');const quizList=[{q:"Opposite of Hot?",o1:"Cold",o2:"Hot",ans:"1"},{q:"Plural of Book?",o1:"Books",o2:"Bookes",ans:"1"},{q:"Sun rises in ___?",o1:"East",o2:"West",ans:"1"},{q:"What is 2 + 2?",o1:"4",o2:"5",ans:"1"},{q:"Letters in Alphabet?",o1:"26",o2:"24",ans:"1"},{q:"Which is color?",o1:"Red",o2:"Table",ans:"1"},{q:"Use to write?",o1:"Pen",o2:"Spoon",ans:"1"},{q:"Opposite of Big?",o1:"Small",o2:"Large",ans:"1"},{q:"Opposite of Day?",o1:"Night",o2:"Light",ans:"1"},{q:"Days in week?",o1:"7",o2:"5",ans:"1"}];const today=new Date().toDateString();let lastDate=localStorage.getItem('efc_quiz_date');let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');if(lastDate!==today){count=0;localStorage.setItem('efc_quiz_date',today);localStorage.setItem('efc_quiz_count','0');}if(count>=10){alert('Daily limit 10/10 done!');setActive('navFish');return;}let s=quizList[Math.floor(Math.random()*quizList.length)];let ans=prompt(`ENGLISH QUIZ (${count+1}/10): ${s.q}\n1. ${s.o1}\n2. ${s.o2}`);if(ans==s.ans){balance+=50;count++;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_quiz_count',count);localStorage.setItem('efc_quiz_date',today);updateLevel();alert(`Correct! +50 EFC! (${count}/10)`);}else alert('Wrong!');setActive('navFish');}
 function invite(){setActive('navFriends');let link='https://t.me/EFC_FISH_BOT?start='+myId;document.getElementById('refLinkInput').value=link;document.getElementById('refByText').innerText=localStorage.getItem('efc_referred_by')||'None';document.getElementById('refModal').style.display='flex';}
