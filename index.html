@@ -48,4 +48,191 @@ body{background:#0a0e1a;color:#fff;overflow:hidden;height:100vh}
 </div>
 <div class="card">
 <div style="font-size:30px">🏆</div>
-<b>Leaderboard</b><br>
+<b>Leaderboard</b><br><small>You: #24</small>
+<div style="text-align:left;margin-top:8px;font-size:12px">
+🥇 AquaWhale - 8900<br>🥈 HookMaster - 5201<br>🥉 ReelKing - 3100
+</div>
+</div>
+</div>
+<div class="nav">
+<div onclick="showQuiz()">📚<br>Learn</div>
+<div class="active">🐟<br>Fish</div>
+<div onclick="invite()">👥<br>Friends</div>
+<div onclick="earn()">🎁<br>Earn</div>
+</div>
+<script>
+let tg = window.Telegram.WebApp; tg.expand();
+let balance = parseInt(localStorage.getItem('efc_bal')||'1250');
+let energy = parseInt(localStorage.getItem('efc_en')||'1000');
+let perTap = parseInt(localStorage.getItem('efc_per')||'1');
+let maxEnergy = 1000;
+document.getElementById('bal').innerText=balance;
+updateEnergy();
+document.getElementById('pond').addEventListener('touchstart', tap);
+document.getElementById('pond').addEventListener('click', tap);
+function tap(e){
+if(energy<=0){alert('No energy left! Come back in 1 hour or invite friends!'); return;}
+energy--; balance+=perTap;
+if(Math.random()>0.7) balance+=2;
+localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_en',energy);
+document.getElementById('bal').innerText=balance;
+updateEnergy();
+showCoin(e);
+tg.HapticFeedback.impactOccurred('light');
+}
+function showCoin(e){
+let x = e.touches? e.touches[0].clientX : e.clientX;
+let y = e.touches? e.touches[0].clientY : e.clientY;
+let el = document.createElement('div'); el.className='coin-pop';
+el.style.left=x+'px'; el.style.top=y+'px'; el.innerText='+'+perTap+' EFC';
+document.body.appendChild(el); setTimeout(()=>el.remove(),800);
+}
+function updateEnergy(){
+document.getElementById('energyText').innerText=energy+'/'+maxEnergy;
+document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';
+localStorage.setItem('efc_en',energy);
+}
+function buyRod(){
+if(balance>=500){balance-=500; perTap=2;
+localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_per',perTap);
+document.getElementById('bal').innerText=balance; alert('Iron Rod Unlocked! Now 2x Income!');
+}else alert('You need 500 EFC! Catch more fish!');
+}
+function showQuiz(){
+  const quizList = [
+    {q:"What is the opposite of Hot?", o1:"Cold", o2:"Hot", ans:"1"},
+    {q:"What is the plural of Book?", o1:"Books", o2:"Bookes", ans:"1"},
+    {q:"Sun rises in the ___?", o1:"East", o2:"West", ans:"1"},
+    {q:"What is 2 + 2?", o1:"4", o2:"5", ans:"1"},
+    {q:"How many letters in English Alphabet?", o1:"26", o2:"24", ans:"1"},
+    {q:"Which is a color?", o1:"Red", o2:"Table", ans:"1"},
+    {q:"What do we use to write?", o1:"Pen", o2:"Spoon", ans:"1"},
+    {q:"What is the opposite of Big?", o1:"Small", o2:"Large", ans:"1"},
+    {q:"What is the meaning of Water?", o1:"Water", o2:"Fire", ans:"1"},
+    {q:"What is the meaning of Apple?", o1:"Apple", o2:"Orange", ans:"1"},
+    {q:"Which animal barks?", o1:"Dog", o2:"Cat", ans:"1"},
+    {q:"Which animal meows?", o1:"Cat", o2:"Dog", ans:"1"},
+    {q:"What is the opposite of Day?", o1:"Night", o2:"Light", ans:"1"},
+    {q:"How many days in a week?", o1:"7", o2:"5", ans:"1"},
+    {q:"How many months in a year?", o1:"12", o2:"10", ans:"1"},
+    {q:"Which is a fruit?", o1:"Mango", o2:"Chair", ans:"1"},
+    {q:"What do bees make?", o1:"Honey", o2:"Milk", ans:"1"},
+    {q:"What is the opposite of Good?", o1:"Bad", o2:"Best", ans:"1"},
+    {q:"What is 10 - 5?", o1:"5", o2:"15", ans:"1"},
+    {q:"Which is a vegetable?", o1:"Potato", o2:"Apple", ans:"1"},
+    {q:"Where do fish live?", o1:"Water", o2:"Land", ans:"1"},
+    {q:"What is the opposite of Up?", o1:"Down", o2:"Top", ans:"1"},
+    {q:"What is the capital of Bangladesh?", o1:"Dhaka", o2:"Chittagong", ans:"1"},
+    {q:"Which is the largest planet?", o1:"Jupiter", o2:"Earth", ans:"1"},
+    {q:"What color is the sky?", o1:"Blue", o2:"Green", ans:"1"},
+    {q:"How many legs does a spider have?", o1:"8", o2:"6", ans:"1"},
+    {q:"What is 5 x 2?", o1:"10", o2:"12", ans:"1"},
+    {q:"What do we breathe?", o1:"Oxygen", o2:"Water", ans:"1"},
+    {q:"Opposite of Fast?", o1:"Slow", o2:"Quick", ans:"1"},
+    {q:"Which is a bird?", o1:"Crow", o2:"Cow", ans:"1"},
+    {q:"What is H2O?", o1:"Water", o2:"Salt", ans:"1"},
+    {q:"How many eyes do we have?", o1:"2", o2:"3", ans:"1"},
+    {q:"What is the opposite of Happy?", o1:"Sad", o2:"Glad", ans:"1"},
+    {q:"Which month has 28 days?", o1:"February", o2:"January", ans:"1"},
+    {q:"What is 100 / 2?", o1:"50", o2:"25", ans:"1"},
+    {q:"What is the opposite of True?", o1:"False", o2:"Right", ans:"1"},
+    {q:"Which is a pet animal?", o1:"Dog", o2:"Lion", ans:"1"},
+    {q:"What do cows give?", o1:"Milk", o2:"Egg", ans:"1"},
+    {q:"What is the opposite of Open?", o1:"Close", o2:"Start", ans:"1"},
+    {q:"How many fingers in one hand?", o1:"5", o2:"6", ans:"1"},
+    {q:"What is the shape of Earth?", o1:"Round", o2:"Square", ans:"1"},
+    {q:"Which is a season?", o1:"Winter", o2:"Hour", ans:"1"},
+    {q:"What is 3 x 3?", o1:"9", o2:"6", ans:"1"},
+    {q:"What do plants need to grow?", o1:"Water", o2:"Milk", ans:"1"},
+    {q:"Opposite of Rich?", o1:"Poor", o2:"Money", ans:"1"},
+    {q:"What is the opposite of Light?", o1:"Dark", o2:"Bright", ans:"1"},
+    {q:"Which is used for cutting?", o1:"Scissors", o2:"Spoon", ans:"1"},
+    {q:"What is 7 + 3?", o1:"10", o2:"7", ans:"1"},
+    {q:"Which is a transport?", o1:"Bus", o2:"House", ans:"1"},
+    {q:"What is the opposite of Win?", o1:"Lose", o2:"Won", ans:"1"},
+    {q:"How many sides in a triangle?", o1:"3", o2:"4", ans:"1"},
+    {q:"What do chickens give?", o1:"Egg", o2:"Milk", ans:"1"},
+    {q:"Opposite of Early?", o1:"Late", o2:"Soon", ans:"1"},
+    {q:"What is the king of jungle?", o1:"Lion", o2:"Tiger", ans:"1"},
+    {q:"What is 20 / 4?", o1:"5", o2:"4", ans:"1"},
+    {q:"Which is a flower?", o1:"Rose", o2:"Mango", ans:"1"},
+    {q:"What is the opposite of New?", o1:"Old", o2:"Newest", ans:"1"},
+    {q:"How many hours in a day?", o1:"24", o2:"12", ans:"1"},
+    {q:"What is frozen water called?", o1:"Ice", o2:"Steam", ans:"1"},
+    {q:"Opposite of Strong?", o1:"Weak", o2:"Power", ans:"1"},
+    {q:"Which is heavier?", o1:"Elephant", o2:"Ant", ans:"1"},
+    {q:"What is 9 - 3?", o1:"6", o2:"9", ans:"1"},
+    {q:"What do we hear with?", o1:"Ears", o2:"Eyes", ans:"1"},
+    {q:"Opposite of Tall?", o1:"Short", o2:"Long", ans:"1"},
+    {q:"Which planet do we live on?", o1:"Earth", o2:"Mars", ans:"1"},
+    {q:"What is 6 x 6?", o1:"36", o2:"30", ans:"1"},
+    {q:"What is the opposite of In?", o1:"Out", o2:"Inside", ans:"1"},
+    {q:"Which is a drink?", o1:"Juice", o2:"Rice", ans:"1"},
+    {q:"What is the opposite of Buy?", o1:"Sell", o2:"Shop", ans:"1"},
+    {q:"How many minutes in an hour?", o1:"60", o2:"100", ans:"1"},
+    {q:"What glows at night?", o1:"Moon", o2:"Sun", ans:"1"},
+    {q:"What is the opposite of Love?", o1:"Hate", o2:"Like", ans:"1"},
+    {q:"Which is a tool?", o1:"Hammer", o2:"Paper", ans:"1"},
+    {q:"What is 8 + 8?", o1:"16", o2:"18", ans:"1"},
+    {q:"Opposite of Begin?", o1:"End", o2:"Start", ans:"1"},
+    {q:"Which is a country?", o1:"Japan", o2:"Dhaka", ans:"1"},
+    {q:"What do we see with?", o1:"Eyes", o2:"Nose", ans:"1"},
+    {q:"Opposite of Hard?", o1:"Soft", o2:"Tough", ans:"1"},
+    {q:"What is 12 / 3?", o1:"4", o2:"6", ans:"1"},
+    {q:"Which is fast?", o1:"Cheetah", o2:"Turtle", ans:"1"},
+    {q:"What is the opposite of Come?", o1:"Go", o2:"Arrive", ans:"1"},
+    {q:"Which is a grain?", o1:"Rice", o2:"Milk", ans:"1"},
+    {q:"What is 15 - 5?", o1:"10", o2:"5", ans:"1"},
+    {q:"Opposite of Full?", o1:"Empty", o2:"Filled", ans:"1"},
+    {q:"What is the opposite of First?", o1:"Last", o2:"Second", ans:"1"},
+    {q:"Which is a metal?", o1:"Iron", o2:"Wood", ans:"1"},
+    {q:"What is 4 x 5?", o1:"20", o2:"25", ans:"1"},
+    {q:"Opposite of Clean?", o1:"Dirty", o2:"Neat", ans:"1"},
+    {q:"What is the opposite of Right?", o1:"Left", o2:"Correct", ans:"1"},
+    {q:"Which is a sweet?", o1:"Sugar", o2:"Salt", ans:"1"},
+    {q:"What is 50 / 5?", o1:"10", o2:"15", ans:"1"},
+    {q:"Opposite of Young?", o1:"Old", o2:"New", ans:"1"},
+    {q:"What is the opposite of Near?", o1:"Far", o2:"Close", ans:"1"},
+    {q:"Which is a wild animal?", o1:"Tiger", o2:"Cow", ans:"1"},
+    {q:"What is 11 + 9?", o1:"20", o2:"21", ans:"1"},
+    {q:"Opposite of Thick?", o1:"Thin", o2:"Fat", ans:"1"},
+    {q:"Which helps to fly?", o1:"Wings", o2:"Legs", ans:"1"},
+    {q:"What is 18 / 2?", o1:"9", o2:"8", ans:"1"},
+    {q:"Opposite of Dry?", o1:"Wet", o2:"Hot", ans:"1"},
+    {q:"What is the tallest animal?", o1:"Giraffe", o2:"Elephant", ans:"1"}
+  ];
+  const randomIndex = Math.floor(Math.random() * quizList.length);
+  const selected = quizList[randomIndex];
+  let ans = prompt(`ENGLISH QUIZ (${randomIndex+1}/100): ${selected.q}\n1. ${selected.o1}\n2. ${selected.o2}\nType your answer (1/2)`);
+  if(ans == selected.ans){
+    balance+=50;
+    document.getElementById('bal').innerText=balance;
+    localStorage.setItem('efc_bal',balance);
+    alert('Correct! +50 EFC Bonus!');
+  } else {
+    alert('Wrong answer! Try again!');
+  }
+}
+function invite(){
+let link = 'https://t.me/EFC_FISH_BOT?start='+tg.initDataUnsafe.user?.id;
+alert('Invite your friend:\n'+link+'\n\n500 EFC + 10% Commission per friend!');
+if(navigator.share) navigator.share({title:'EFC Fish',url:link});
+}
+function earn(){
+  const lastClaim = localStorage.getItem('efc_daily_date');
+  const today = new Date().toDateString();
+  if(lastClaim === today){
+    alert('Already claimed today! Come back tomorrow!');
+    return;
+  }
+  balance+=100;
+  document.getElementById('bal').innerText=balance;
+  localStorage.setItem('efc_bal',balance);
+  localStorage.setItem('efc_daily_date', today);
+  alert('Daily Reward Claimed! +100 EFC');
+  tg.HapticFeedback.notificationOccurred('success');
+}
+setInterval(()=>{if(energy<maxEnergy){energy++; updateEnergy();}},3000);
+</script>
+</body>
+</html>
