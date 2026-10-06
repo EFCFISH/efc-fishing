@@ -7,13 +7,13 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#0a0e1a;color:#fff;overflow:hidden;height:100vh}
+body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflow-y:auto}
 .header{padding:15px;display:flex;justify-content:space-between;align-items:center;background:#151a2d}
 .balance{background:linear-gradient(90deg,#FFD700,#FFA500);padding:10px 20px;border-radius:20px;color:#000;font-weight:bold}
 .energy-box{margin:10px 20px;background:#1e2540;border-radius:15px;padding:12px}
 .energy-bar{height:12px;background:#333;border-radius:10px;overflow:hidden;margin-top:8px}
-.energy-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);width:85%;transition:0.3s}
-.pond{margin:20px;height:38vh;background:radial-gradient(circle at 50% 30%,#1a3a5a,#0a1a2a);border-radius:25px;position:relative;display:flex;align-items:center;justify-content:center;border:2px solid #FFD700;cursor:pointer;user-select:none}
+.energy-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);width:100%;transition:0.3s}
+.pond{margin:20px;height:38vh;background:radial-gradient(circle at 50% 30%,#1a3a5a,#0a1a2a);border-radius:25px;position:relative;display:flex;align-items:center;justify-content:center;border:2px solid #FFD700;cursor:pointer}
 .fish-emoji{font-size:80px;animation:float 2s infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
 .tap-text{position:absolute;bottom:20px;background:rgba(0,0,0,0.7);padding:8px 18px;border-radius:20px;font-weight:bold;color:#FFD700}
@@ -22,310 +22,42 @@ body{background:#0a0e1a;color:#fff;overflow:hidden;height:100vh}
 .shop{display:flex;gap:12px;padding:0 20px;margin-top:10px}
 .card{flex:1;background:#1e2540;border:1px solid #FFD700;border-radius:15px;padding:15px;text-align:center}
 .card button{background:#FFD700;border:none;padding:8px 15px;border-radius:10px;font-weight:bold;margin-top:10px;width:100%;cursor:pointer}
-.nav{position:fixed;bottom:0;width:100%;background:#151a2d;display:flex;justify-content:space-around;padding:12px 0;border-top:1px solid #333}
+.nav{position:fixed;bottom:0;width:100%;background:#151a2d;display:flex;justify-content:space-around;padding:12px 0;border-top:1px solid #333;z-index:999}
 .nav div{text-align:center;opacity:0.6;cursor:pointer}
 .nav div.active{opacity:1;color:#FFD700}
 </style>
 </head>
 <body>
-<div class="header">
-<div><b>EFC Fishing Frenzy</b><br><small style="color:#FFD700">Level 3 Fisher</small></div>
-<div class="balance">💰 <span id="bal">1250</span> EFC</div>
-</div>
-<div class="energy-box">
-<div style="display:flex;justify-content:space-between"><span>⚡ ENERGY</span><span id="energyText">1000/1000</span></div>
-<div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div>
-</div>
-<div class="pond" id="pond">
-<div class="fish-emoji" id="fish">🎣</div>
-<div class="tap-text">TAP TO FISH!</div>
-</div>
-<div class="shop">
-<div class="card">
-<div style="font-size:30px">🪝</div>
-<b>Iron Rod</b><br><small>2x Earning</small>
-<button onclick="buyRod()">500 EFC - BUY</button>
-</div>
-<div class="card">
-<div style="font-size:30px">🏆</div>
-<b>Leaderboard</b><br><small>You: #24</small>
-<div style="text-align:left;margin-top:8px;font-size:12px">
-🥇 AquaWhale - 8900<br>🥈 HookMaster - 5201<br>🥉 ReelKing - 3100
-</div>
-</div>
-</div>
-<div class="nav">
-<div onclick="showQuiz()">📚<br>Learn</div>
-<div class="active">🐟<br>Fish</div>
-<div onclick="invite()">👥<br>Friends</div>
-<div onclick="earn()">🎁<br>Earn</div>
-</div>
+<div class="header"><div><b>EFC Fishing Frenzy</b><br><small style="color:#FFD700">Level 3 Fisher</small></div><div class="balance">💰 <span id="bal">1250</span> EFC</div></div>
+<div class="energy-box"><div style="display:flex;justify-content:space-between"><span>⚡ ENERGY</span><span id="energyText">1000/1000</span></div><div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div></div>
+<div class="pond" id="pond"><div class="fish-emoji">🎣</div><div class="tap-text">TAP TO FISH!</div></div>
+<div class="shop"><div class="card"><div style="font-size:30px">🪝</div><b>Iron Rod</b><br><small>2x Earning</small><button onclick="buyRod()">500 EFC - BUY</button></div><div class="card"><div style="font-size:30px">🏆</div><b>Leaderboard</b><br><small>You: #24</small><div style="text-align:left;margin-top:8px;font-size:12px">🥇 AquaWhale - 8900<br>🥈 HookMaster - 5201<br>🥉 ReelKing - 3100</div></div></div>
+<div class="nav"><div onclick="showQuiz()">📚<br>Learn</div><div class="active">🐟<br>Fish</div><div onclick="invite()">👥<br>Friends</div><div onclick="earn()">🎁<br>Earn</div></div>
 <script>
-let tg = window.Telegram.WebApp; tg.expand();
-let balance = parseInt(localStorage.getItem('efc_bal')||'1250');
-let energy = parseInt(localStorage.getItem('efc_en')||'1000');
-let perTap = parseInt(localStorage.getItem('efc_per')||'1');
-let maxEnergy = 1000;
-
-// === REFERRAL SYSTEM ADDED ===
-const myId = tg.initDataUnsafe.user?.id;
-const startParam = tg.initDataUnsafe.start_param;
-const refClaimed = localStorage.getItem('efc_ref_claimed');
-
-if(startParam &&!refClaimed && startParam!= myId){
-  balance += 500;
-  localStorage.setItem('efc_bal', balance);
-  localStorage.setItem('efc_ref_claimed', 'true');
-  localStorage.setItem('efc_referred_by', startParam);
-  setTimeout(()=>{ alert('Welcome via Referral! +500 EFC Bonus Added!'); document.getElementById('bal').innerText=balance; }, 800);
+let tg=window.Telegram.WebApp;tg.expand();
+let balance=parseInt(localStorage.getItem('efc_bal')||'1250');
+let energy=parseInt(localStorage.getItem('efc_en')||'1000');
+let perTap=parseInt(localStorage.getItem('efc_per')||'1');
+let maxEnergy=1000;
+const myId=tg.initDataUnsafe.user?.id;
+const startParam=tg.initDataUnsafe.start_param;
+if(startParam&&!localStorage.getItem('efc_ref_claimed')&&startParam!=myId){
+ balance+=500;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_ref_claimed','true');localStorage.setItem('efc_referred_by',startParam);
+ setTimeout(()=>{alert('Welcome via Referral! +500 EFC Bonus!');document.getElementById('bal').innerText=balance},800);
 }
-
 document.getElementById('bal').innerText=balance;
+function updateEnergy(){document.getElementById('energyText').innerText=energy+'/'+maxEnergy;document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';localStorage.setItem('efc_en',energy);}
 updateEnergy();
-document.getElementById('pond').addEventListener('touchstart', tap);
-document.getElementById('pond').addEventListener('click', tap);
-function tap(e){
-if(energy<=0){alert('No energy left! Come back in 1 hour or invite friends!'); return;}
-energy--; balance+=perTap;
-if(Math.random()>0.7) balance+=2;
-localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_en',energy);
-document.getElementById('bal').innerText=balance;
-updateEnergy();
-showCoin(e);
-tg.HapticFeedback.impactOccurred('light');
-}
-function showCoin(e){
-let x = e.touches? e.touches[0].clientX : e.clientX;
-let y = e.touches? e.touches[0].clientY : e.clientY;
-let el = document.createElement('div'); el.className='coin-pop';
-el.style.left=x+'px'; el.style.top=y+'px'; el.innerText='+'+perTap+' EFC';
-document.body.appendChild(el); setTimeout(()=>el.remove(),800);
-}
-function updateEnergy(){
-document.getElementById('energyText').innerText=energy+'/'+maxEnergy;
-document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';
-localStorage.setItem('efc_en',energy);
-}
-function buyRod(){
-if(balance>=500){balance-=500; perTap=2;
-localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_per',perTap);
-document.getElementById('bal').innerText=balance; alert('Iron Rod Unlocked! Now 2x Income!');
-}else alert('You need 500 EFC! Catch more fish!');
-}
+document.getElementById('pond').addEventListener('click',tap);
+document.getElementById('pond').addEventListener('touchstart',tap);
+function tap(e){if(energy<=0){alert('No energy left! Invite friends!');return;}energy--;balance+=perTap;if(Math.random()>0.7)balance+=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_en',energy);document.getElementById('bal').innerText=balance;updateEnergy();let x=e.touches?e.touches[0].clientX:e.clientX;let y=e.touches?e.touches[0].clientY:e.clientY;let el=document.createElement('div');el.className='coin-pop';el.style.left=x+'px';el.style.top=y+'px';el.innerText='+'+perTap+' EFC';document.body.appendChild(el);setTimeout(()=>el.remove(),800);tg.HapticFeedback.impactOccurred('light');}
+function buyRod(){if(balance>=500){balance-=500;perTap=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_per',perTap);document.getElementById('bal').innerText=balance;alert('Iron Rod Unlocked! Now 2x Income!');}else alert('Need 500 EFC!');}
 function showQuiz(){
-  const quizList = [
-    {q:"What is the opposite of Hot?", o1:"Cold", o2:"Hot", ans:"1"},
-    {q:"What is the plural of Book?", o1:"Books", o2:"Bookes", ans:"1"},
-    {q:"Sun rises in the ___?", o1:"East", o2:"West", ans:"1"},
-    {q:"What is 2 + 2?", o1:"4", o2:"5", ans:"1"},
-    {q:"How many letters in English Alphabet?", o1:"26", o2:"24", ans:"1"},
-    {q:"Which is a color?", o1:"Red", o2:"Table", ans:"1"},
-    {q:"What do we use to write?", o1:"Pen", o2:"Spoon", ans:"1"},
-    {q:"What is the opposite of Big?", o1:"Small", o2:"Large", ans:"1"},
-    {q:"What is the meaning of Water?", o1:"Water", o2:"Fire", ans:"1"},
-    {q:"What is the meaning of Apple?", o1:"Apple", o2:"Orange", ans:"1"},
-    {q:"Which animal barks?", o1:"Dog", o2:"Cat", ans:"1"},
-    {q:"Which animal meows?", o1:"Cat", o2:"Dog", ans:"1"},
-    {q:"What is the opposite of Day?", o1:"Night", o2:"Light", ans:"1"},
-    {q:"How many days in a week?", o1:"7", o2:"5", ans:"1"},
-    {q:"How many months in a year?", o1:"12", o2:"10", ans:"1"},
-    {q:"Which is a fruit?", o1:"Mango", o2:"Chair", ans:"1"},
-    {q:"What do bees make?", o1:"Honey", o2:"Milk", ans:"1"},
-    {q:"What is the opposite of Good?", o1:"Bad", o2:"Best", ans:"1"},
-    {q:"What is 10 - 5?", o1:"5", o2:"15", ans:"1"},
-    {q:"Which is a vegetable?", o1:"Potato", o2:"Apple", ans:"1"},
-    {q:"Where do fish live?", o1:"Water", o2:"Land", ans:"1"},
-    {q:"What is the opposite of Up?", o1:"Down", o2:"Top", ans:"1"},
-    {q:"What is the capital of Bangladesh?", o1:"Dhaka", o2:"Chittagong", ans:"1"},
-    {q:"Which is the largest planet?", o1:"Jupiter", o2:"Earth", ans:"1"},
-    {q:"What color is the sky?", o1:"Blue", o2:"Green", ans:"1"},
-    {q:"How many legs does a spider have?", o1:"8", o2:"6", ans:"1"},
-    {q:"What is 5 x 2?", o1:"10", o2:"12", ans:"1"},
-    {q:"What do we breathe?", o1:"Oxygen", o2:"Water", ans:"1"},
-    {q:"Opposite of Fast?", o1:"Slow", o2:"Quick", ans:"1"},
-    {q:"Which is a bird?", o1:"Crow", o2:"Cow", ans:"1"},
-    {q:"What is H2O?", o1:"Water", o2:"Salt", ans:"1"},
-    {q:"How many eyes do we have?", o1:"2", o2:"3", ans:"1"},
-    {q:"What is the opposite of Happy?", o1:"Sad", o2:"Glad", ans:"1"},
-    {q:"Which month has 28 days?", o1:"February", o2:"January", ans:"1"},
-    {q:"What is 100 / 2?", o1:"50", o2:"25", ans:"1"},
-    {q:"What is the opposite of True?", o1:"False", o2:"Right", ans:"1"},
-    {q:"Which is a pet animal?", o1:"Dog", o2:"Lion", ans:"1"},
-    {q:"What do cows give?", o1:"Milk", o2:"Egg", ans:"1"},
-    {q:"What is the opposite of Open?", o1:"Close", o2:"Start", ans:"1"},
-    {q:"How many fingers in one hand?", o1:"5", o2:"6", ans:"1"},
-    {q:"What is the shape of Earth?", o1:"Round", o2:"Square", ans:"1"},
-    {q:"Which is a season?", o1:"Winter", o2:"Hour", ans:"1"},
-    {q:"What is 3 x 3?", o1:"9", o2:"6", ans:"1"},
-    {q:"What do plants need to grow?", o1:"Water", o2:"Milk", ans:"1"},
-    {q:"Opposite of Rich?", o1:"Poor", o2:"Money", ans:"1"},
-    {q:"What is the opposite of Light?", o1:"Dark", o2:"Bright", ans:"1"},
-    {q:"Which is used for cutting?", o1:"Scissors", o2:"Spoon", ans:"1"},
-    {q:"What is 7 + 3?", o1:"10", o2:"7", ans:"1"},
-    {q:"Which is a transport?", o1:"Bus", o2:"House", ans:"1"},
-    {q:"What is the opposite of Win?", o1:"Lose", o2:"Won", ans:"1"},
-    {q:"How many sides in a triangle?", o1:"3", o2:"4", ans:"1"},
-    {q:"What do chickens give?", o1:"Egg", o2:"Milk", ans:"1"},
-    {q:"Opposite of Early?", o1:"Late", o2:"Soon", ans:"1"},
-    {q:"What is the king of jungle?", o1:"Lion", o2:"Tiger", ans:"1"},
-    {q:"What is 20 / 4?", o1:"5", o2:"4", ans:"1"},
-    {q:"Which is a flower?", o1:"Rose", o2:"Mango", ans:"1"},
-    {q:"What is the opposite of New?", o1:"Old", o2:"Newest", ans:"1"},
-    {q:"How many hours in a day?", o1:"24", o2:"12", ans:"1"},
-    {q:"What is frozen water called?", o1:"Ice", o2:"Steam", ans:"1"},
-    {q:"Opposite of Strong?", o1:"Weak", o2:"Power", ans:"1"},
-    {q:"Which is heavier?", o1:"Elephant", o2:"Ant", ans:"1"},
-    {q:"What is 9 - 3?", o1:"6", o2:"9", ans:"1"},
-    {q:"What do we hear with?", o1:"Ears", o2:"Eyes", ans:"1"},
-    {q:"Opposite of Tall?", o1:"Short", o2:"Long", ans:"1"},
-    {q:"Which planet do we live on?", o1:"Earth", o2:"Mars", ans:"1"},
-    {q:"What is 6 x 6?", o1:"36", o2:"30", ans:"1"},
-    {q:"What is the opposite of In?", o1:"Out", o2:"Inside", ans:"1"},
-    {q:"Which is a drink?", o1:"Juice", o2:"Rice", ans:"1"},
-    {q:"What is the opposite of Buy?", o1:"Sell", o2:"Shop", ans:"1"},
-    {q:"How many minutes in an hour?", o1:"60", o2:"100", ans:"1"},
-    {q:"What glows at night?", o1:"Moon", o2:"Sun", ans:"1"},
-    {q:"What is the opposite of Love?", o1:"Hate", o2:"Like", ans:"1"},
-    {q:"Which is a tool?", o1:"Hammer", o2:"Paper", ans:"1"},
-    {q:"What is 8 + 8?", o1:"16", o2:"18", ans:"1"},
-    {q:"Opposite of Begin?", o1:"End", o2:"Start", ans:"1"},
-    {q:"Which is a country?", o1:"Japan", o2:"Dhaka", ans:"1"},
-    {q:"What do we see with?", o1:"Eyes", o2:"Nose", ans:"1"},
-    {q:"Opposite of Hard?", o1:"Soft", o2:"Tough", ans:"1"},
-    {q:"What is 12 / 3?", o1:"4", o2:"6", ans:"1"},
-    {q:"Which is fast?", o1:"Cheetah", o2:"Turtle", ans:"1"},
-    {q:"What is the opposite of Come?", o1:"Go", o2:"Arrive", ans:"1"},
-    {q:"Which is a grain?", o1:"Rice", o2:"Milk", ans:"1"},
-    {q:"What is 15 - 5?", o1:"10", o2:"5", ans:"1"},
-    {q:"Opposite of Full?", o1:"Empty", o2:"Filled", ans:"1"},
-    {q:"What is the opposite of First?", o1:"Last", o2:"Second", ans:"1"},
-    {q:"Which is a metal?", o1:"Iron", o2:"Wood", ans:"1"},
-    {q:"What is 4 x 5?", o1:"20", o2:"25", ans:"1"},
-    {q:"Opposite of Clean?", o1:"Dirty", o2:"Neat", ans:"1"},
-    {q:"What is the opposite of Right?", o1:"Left", o2:"Correct", ans:"1"},
-    {q:"Which is a sweet?", o1:"Sugar", o2:"Salt", ans:"1"},
-    {q:"What is 50 / 5?", o1:"10", o2:"15", ans:"1"},
-    {q:"Opposite of Young?", o1:"Old", o2:"New", ans:"1"},
-    {q:"What is the opposite of Near?", o1:"Far", o2:"Close", ans:"1"},
-    {q:"Which is a wild animal?", o1:"Tiger", o2:"Cow", ans:"1"},
-    {q:"What is 11 + 9?", o1:"20", o2:"21", ans:"1"},
-    {q:"Opposite of Thick?", o1:"Thin", o2:"Fat", ans:"1"},
-    {q:"Which helps to fly?", o1:"Wings", o2:"Legs", ans:"1"},
-    {q:"What is 18 / 2?", o1:"9", o2:"8", ans:"1"},
-    {q:"Opposite of Dry?", o1:"Wet", o2:"Hot", ans:"1"},
-    {q:"What is the tallest animal?", o1:"Giraffe", o2:"Elephant", ans:"1"}
-  ];
-  const today = new Date().toDateString();
-  const lastDate = localStorage.getItem('efc_quiz_date');
-  let count = parseInt(localStorage.getItem('efc_quiz_count') || '0');
-  if(lastDate!== today){
-    count = 0;
-    localStorage.setItem('efc_quiz_date', today);
-    localStorage.setItem('efc_quiz_count', '0');
-  }
-  if(count >= 10){
-    alert('Daily limit reached! You completed 10 quizzes today. Come back tomorrow!');
-    return;
-  }
-  const randomIndex = Math.floor(Math.random() * quizList.length);
-  const selected = quizList[randomIndex];
-  let ans = prompt(`ENGLISH QUIZ (${count+1}/10 Today): ${selected.q}\n1. ${selected.o1}\n2. ${selected.o2}\nType your answer (1/2)`);
-  if(ans == selected.ans){
-    balance+=50;
-    count++;
-    document.getElementById('bal').innerText=balance;
-    localStorage.setItem('efc_bal',balance);
-    localStorage.setItem('efc_quiz_count', count.toString());
-    localStorage.setItem('efc_quiz_date', today);
-    alert(`Correct! +50 EFC Bonus! (${count}/10 Today Completed)`);
-  } else {
-    alert('Wrong answer! Try again!');
-  }
-}
-function invite(){
-  const myId = tg.initDataUnsafe.user?.id || '0';
-  let link = `https://t.me/EFC_FISH_BOT?start=${myId}`;
-  let invited = parseInt(localStorage.getItem('efc_invited')||'0');
-  let referredBy = localStorage.getItem('efc_referred_by') || 'None';
-  alert(`Your Referral Link:\n${link}\n\nInvited: ${invited} Friends\nReferred By: ${referredBy}\n\nReward: 500 EFC per referral!`);
-  if(navigator.share){ navigator.share({title:'EFC Fishing Frenzy', url:link}); }
-  else { navigator.clipboard.writeText(link); }
-}
-function earn(){
-  const lastClaim = localStorage.getItem('efc_daily_date');
-  const today = new Date().toDateString();
-  if(lastClaim === today){
-    alert('Already claimed today! Come back tomorrow!');
-    return;
-  }
-  balance+=100;
-  document.getElementById('bal').innerText=balance;
-  localStorage.setItem('efc_bal',balance);
-  localStorage.setItem('efc_daily_date', today);
-  alert('Daily Reward Claimed! +100 EFC');
-  tg.HapticFeedback.notificationOccurred('success');
-}
-setInterval(()=>{if(energy<maxEnergy){energy++; updateEnergy();}},3000);
-</script>
-</body>
-</html>"1"},
-    {q:"What do we see with?", o1:"Eyes", o2:"Nose", ans:"1"},
-    {q:"Opposite of Hard?", o1:"Soft", o2:"Tough", ans:"1"},
-    {q:"What is 12 / 3?", o1:"4", o2:"6", ans:"1"},
-    {q:"Which is fast?", o1:"Cheetah", o2:"Turtle", ans:"1"},
-    {q:"What is the opposite of Come?", o1:"Go", o2:"Arrive", ans:"1"},
-    {q:"Which is a grain?", o1:"Rice", o2:"Milk", ans:"1"},
-    {q:"What is 15 - 5?", o1:"10", o2:"5", ans:"1"},
-    {q:"Opposite of Full?", o1:"Empty", o2:"Filled", ans:"1"},
-    {q:"What is the opposite of First?", o1:"Last", o2:"Second", ans:"1"},
-    {q:"Which is a metal?", o1:"Iron", o2:"Wood", ans:"1"},
-    {q:"What is 4 x 5?", o1:"20", o2:"25", ans:"1"},
-    {q:"Opposite of Clean?", o1:"Dirty", o2:"Neat", ans:"1"},
-    {q:"What is the opposite of Right?", o1:"Left", o2:"Correct", ans:"1"},
-    {q:"Which is a sweet?", o1:"Sugar", o2:"Salt", ans:"1"},
-    {q:"What is 50 / 5?", o1:"10", o2:"15", ans:"1"},
-    {q:"Opposite of Young?", o1:"Old", o2:"New", ans:"1"},
-    {q:"What is the opposite of Near?", o1:"Far", o2:"Close", ans:"1"},
-    {q:"Which is a wild animal?", o1:"Tiger", o2:"Cow", ans:"1"},
-    {q:"What is 11 + 9?", o1:"20", o2:"21", ans:"1"},
-    {q:"Opposite of Thick?", o1:"Thin", o2:"Fat", ans:"1"},
-    {q:"Which helps to fly?", o1:"Wings", o2:"Legs", ans:"1"},
-    {q:"What is 18 / 2?", o1:"9", o2:"8", ans:"1"},
-    {q:"Opposite of Dry?", o1:"Wet", o2:"Hot", ans:"1"},
-    {q:"What is the tallest animal?", o1:"Giraffe", o2:"Elephant", ans:"1"}
-  ];
-  const randomIndex = Math.floor(Math.random() * quizList.length);
-  const selected = quizList[randomIndex];
-  let ans = prompt(`ENGLISH QUIZ (${randomIndex+1}/100): ${selected.q}\n1. ${selected.o1}\n2. ${selected.o2}\nType your answer (1/2)`);
-  if(ans == selected.ans){
-    balance+=50;
-    document.getElementById('bal').innerText=balance;
-    localStorage.setItem('efc_bal',balance);
-    alert('Correct! +50 EFC Bonus!');
-  } else {
-    alert('Wrong answer! Try again!');
-  }
-}
-function invite(){
-let link = 'https://t.me/EFC_FISH_BOT?start='+tg.initDataUnsafe.user?.id;
-alert('Invite your friend:\n'+link+'\n\n500 EFC + 10% Commission per friend!');
-if(navigator.share) navigator.share({title:'EFC Fish',url:link});
-}
-function earn(){
-  const lastClaim = localStorage.getItem('efc_daily_date');
-  const today = new Date().toDateString();
-  if(lastClaim === today){
-    alert('Already claimed today! Come back tomorrow!');
-    return;
-  }
-  balance+=100;
-  document.getElementById('bal').innerText=balance;
-  localStorage.setItem('efc_bal',balance);
-  localStorage.setItem('efc_daily_date', today);
-  alert('Daily Reward Claimed! +100 EFC');
-  tg.HapticFeedback.notificationOccurred('success');
-}
-setInterval(()=>{if(energy<maxEnergy){energy++; updateEnergy();}},3000);
+const quizList=[{q:"Opposite of Hot?",o1:"Cold",o2:"Hot",ans:"1"},{q:"Plural of Book?",o1:"Books",o2:"Bookes",ans:"1"},{q:"Sun rises in ___?",o1:"East",o2:"West",ans:"1"},{q:"What is 2 + 2?",o1:"4",o2:"5",ans:"1"},{q:"Letters in Alphabet?",o1:"26",o2:"24",ans:"1"},{q:"Which is color?",o1:"Red",o2:"Table",ans:"1"},{q:"Use to write?",o1:"Pen",o2:"Spoon",ans:"1"},{q:"Opposite of Big?",o1:"Small",o2:"Large",ans:"1"},{q:"Water means?",o1:"Water",o2:"Fire",ans:"1"},{q:"Apple means?",o1:"Apple",o2:"Orange",ans:"1"},{q:"Which barks?",o1:"Dog",o2:"Cat",ans:"1"},{q:"Which meows?",o1:"Cat",o2:"Dog",ans:"1"},{q:"Opposite of Day?",o1:"Night",o2:"Light",ans:"1"},{q:"Days in week?",o1:"7",o2:"5",ans:"1"},{q:"Months in year?",o1:"12",o2:"10",ans:"1"},{q:"Which is fruit?",o1:"Mango",o2:"Chair",ans:"1"},{q:"Bees make?",o1:"Honey",o2:"Milk",ans:"1"},{q:"Opposite of Good?",o1:"Bad",o2:"Best",ans:"1"},{q:"10-5?",o1:"5",o2:"15",ans:"1"},{q:"Which is vegetable?",o1:"Potato",o2:"Apple",ans:"1"},{q:"Fish live in?",o1:"Water",o2:"Land",ans:"1"},{q:"Opposite of Up?",o1:"Down",o2:"Top",ans:"1"},{q:"Capital of Bangladesh?",o1:"Dhaka",o2:"Chittagong",ans:"1"},{q:"Largest planet?",o1:"Jupiter",o2:"Earth",ans:"1"},{q:"Sky color?",o1:"Blue",o2:"Green",ans:"1"},{q:"Spider legs?",o1:"8",o2:"6",ans:"1"},{q:"5 x 2?",o1:"10",o2:"12",ans:"1"},{q:"We breathe?",o1:"Oxygen",o2:"Water",ans:"1"},{q:"Opposite of Fast?",o1:"Slow",o2:"Quick",ans:"1"},{q:"Which is bird?",o1:"Crow",o2:"Cow",ans:"1"},{q:"H2O is?",o1:"Water",o2:"Salt",ans:"1"},{q:"Eyes we have?",o1:"2",o2:"3",ans:"1"},{q:"Opposite Happy?",o1:"Sad",o2:"Glad",ans:"1"},{q:"28 days month?",o1:"February",o2:"January",ans:"1"},{q:"100 / 2?",o1:"50",o2:"25",ans:"1"},{q:"Opposite True?",o1:"False",o2:"Right",ans:"1"},{q:"Pet animal?",o1:"Dog",o2:"Lion",ans:"1"},{q:"Cows give?",o1:"Milk",o2:"Egg",ans:"1"},{q:"Opposite Open?",o1:"Close",o2:"Start",ans:"1"},{q:"Fingers in hand?",o1:"5",o2:"6",ans:"1"},{q:"Shape of Earth?",o1:"Round",o2:"Square",ans:"1"},{q:"Which is season?",o1:"Winter",o2:"Hour",ans:"1"},{q:"3 x 3?",o1:"9",o2:"6",ans:"1"},{q:"Plants need?",o1:"Water",o2:"Milk",ans:"1"},{q:"Opposite Rich?",o1:"Poor",o2:"Money",ans:"1"},{q:"Opposite Light?",o1:"Dark",o2:"Bright",ans:"1"},{q:"Used for cutting?",o1:"Scissors",o2:"Spoon",ans:"1"},{q:"7+3?",o1:"10",o2:"7",ans:"1"},{q:"Transport?",o1:"Bus",o2:"House",ans:"1"},{q:"Opposite Win?",o1:"Lose",o2:"Won",ans:"1"},{q:"Triangle sides?",o1:"3",o2:"4",ans:"1"},{q:"Chickens give?",o1:"Egg",o2:"Milk",ans:"1"},{q:"Opposite Early?",o1:"Late",o2:"Soon",ans:"1"},{q:"King of jungle?",o1:"Lion",o2:"Tiger",ans:"1"},{q:"20/4?",o1:"5",o2:"4",ans:"1"},{q:"Which is flower?",o1:"Rose",o2:"Mango",ans:"1"},{q:"Opposite New?",o1:"Old",o2:"Newest",ans:"1"},{q:"Hours in day?",o1:"24",o2:"12",ans:"1"},{q:"Frozen water?",o1:"Ice",o2:"Steam",ans:"1"},{q:"Opposite Strong?",o1:"Weak",o2:"Power",ans:"1"},{q:"Heavier?",o1:"Elephant",o2:"Ant",ans:"1"},{q:"9-3?",o1:"6",o2:"9",ans:"1"},{q:"Hear with?",o1:"Ears",o2:"Eyes",ans:"1"},{q:"Opposite Tall?",o1:"Short",o2:"Long",ans:"1"},{q:"We live on?",o1:"Earth",o2:"Mars",ans:"1"},{q:"6x6?",o1:"36",o2:"30",ans:"1"},{q:"Opposite In?",o1:"Out",o2:"Inside",ans:"1"},{q:"Which is drink?",o1:"Juice",o2:"Rice",ans:"1"},{q:"Opposite Buy?",o1:"Sell",o2:"Shop",ans:"1"},{q:"Minutes in hour?",o1:"60",o2:"100",ans:"1"},{q:"Glows at night?",o1:"Moon",o2:"Sun",ans:"1"},{q:"Opposite Love?",o1:"Hate",o2:"Like",ans:"1"},{q:"Which is tool?",o1:"Hammer",o2:"Paper",ans:"1"},{q:"8+8?",o1:"16",o2:"18",ans:"1"},{q:"Opposite Begin?",o1:"End",o2:"Start",ans:"1"},{q:"Which is country?",o1:"Japan",o2:"Dhaka",ans:"1"},{q:"See with?",o1:"Eyes",o2:"Nose",ans:"1"},{q:"Opposite Hard?",o1:"Soft",o2:"Tough",ans:"1"},{q:"12/3?",o1:"4",o2:"6",ans:"1"},{q:"Which is fast?",o1:"Cheetah",o2:"Turtle",ans:"1"},{q:"Opposite Come?",o1:"Go",o2:"Arrive",ans:"1"},{q:"Which is grain?",o1:"Rice",o2:"Milk",ans:"1"},{q:"15-5?",o1:"10",o2:"5",ans:"1"},{q:"Opposite Full?",o1:"Empty",o2:"Filled",ans:"1"},{q:"Opposite First?",o1:"Last",o2:"Second",ans:"1"},{q:"Which is metal?",o1:"Iron",o2:"Wood",ans:"1"},{q:"4x5?",o1:"20",o2:"25",ans:"1"},{q:"Opposite Clean?",o1:"Dirty",o2:"Neat",ans:"1"},{q:"Opposite Right?",o1:"Left",o2:"Correct",ans:"1"},{q:"Which is sweet?",o1:"Sugar",o2:"Salt",ans:"1"},{q:"50/5?",o1:"10",o2:"15",ans:"1"},{q:"Opposite Young?",o1:"Old",o2:"New",ans:"1"},{q:"Opposite Near?",o1:"Far",o2:"Close",ans:"1"},{q:"Wild animal?",o1:"Tiger",o2:"Cow",ans:"1"},{q:"11+9?",o1:"20",o2:"21",ans:"1"},{q:"Opposite Thick?",o1:"Thin",o2:"Fat",ans:"1"},{q:"Helps to fly?",o1:"Wings",o2:"Legs",ans:"1"},{q:"18/2?",o1:"9",o2:"8",ans:"1"},{q:"Opposite Dry?",o1:"Wet",o2:"Hot",ans:"1"},{q:"Tallest animal?",o1:"Giraffe",o2:"Elephant",ans:"1"}];
+const today=new Date().toDateString();let lastDate=localStorage.getItem('efc_quiz_date');let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');if(lastDate!==today){count=0;localStorage.setItem('efc_quiz_date',today);localStorage.setItem('efc_quiz_count','0');}if(count>=10){alert('Daily limit reached! 10/10 done! Come back tomorrow!');return;}let idx=Math.floor(Math.random()*quizList.length);let s=quizList[idx];let ans=prompt(`ENGLISH QUIZ (${count+1}/10): ${s.q}\n1. ${s.o1}\n2. ${s.o2}`);if(ans==s.ans){balance+=50;count++;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_quiz_count',count);localStorage.setItem('efc_quiz_date',today);alert(`Correct! +50 EFC! (${count}/10)`);}else alert('Wrong answer!');}
+function invite(){let link='https://t.me/EFC_FISH_BOT?start='+(myId||'0');let by=localStorage.getItem('efc_referred_by')||'None';alert(`Referral Link:\n${link}\nReferred By: ${by}\nReward: 500 EFC per friend!`);if(navigator.share)navigator.share({url:link});else navigator.clipboard.writeText(link);}
+function earn(){let last=localStorage.getItem('efc_daily_date');let today=new Date().toDateString();if(last===today){alert('Already claimed today!');return;}balance+=100;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_daily_date',today);alert('Daily +100 EFC!');tg.HapticFeedback.notificationOccurred('success');}
+setInterval(()=>{if(energy<maxEnergy){energy++;updateEnergy();}},3000);
 </script>
 </body>
 </html>
