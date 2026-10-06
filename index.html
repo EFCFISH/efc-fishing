@@ -39,8 +39,24 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 </head>
 <body>
 <div id="toast"></div>
+
+<!-- ===== REAL WATER & REWARD SOUND PACK ===== -->
+<audio id="waterBg" loop preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-underwater-bubbles-1183-0.mp3"></audio>
+<audio id="bubble1" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-water-bubble-1317-0.mp3"></audio>
+<audio id="bubble2" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-bubble-pop-918-0.mp3"></audio>
+<audio id="splashSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-fish-bite-2620-0.mp3"></audio>
+<audio id="catchSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-water-splash-1311-0.mp3"></audio>
+<audio id="rewardSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253-0.mp3"></audio>
+<audio id="coinRainSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-casino-bling-achievement-2060-0.mp3"></audio>
+
 <div class="header"><div><b>EFC Fishing Frenzy</b><br><small id="levelText" style="color:#CD7F32;font-weight:bold">🥉 Bronze Fisher</small></div><div class="balance" onclick="showBalance()">💰 <span id="bal">1250</span> EFC</div></div>
-<div class="level-box"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Next Level Progress</span><span id="nextNeed" style="color:#FFD700">...</span></div><div style="height:8px;background:#0a0e1a;border-radius:10px;margin-top:8px;overflow:hidden;border:1px solid #333"><div id="levelProgress" style="height:100%;width:0%;transition:0.5s"></div></div></div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin:0 20px">
+<div id="muteBtn" onclick="toggleMute()" style="background:#1e2540;border:1px solid #FFD700;border-radius:20px;padding:6px 12px;font-size:11px;cursor:pointer">🌊 Sound On</div>
+<div style="font-size:11px;opacity:0.6">Next Level Progress</div>
+</div>
+
+<div class="level-box"><div style="display:flex;justify-content:space-between;font-size:12px"><span id="nextNeed" style="color:#FFD700">...</span></div><div style="height:8px;background:#0a0e1a;border-radius:10px;margin-top:8px;overflow:hidden;border:1px solid #333"><div id="levelProgress" style="height:100%;width:0%;transition:0.5s"></div></div></div>
 <div class="energy-box"><div style="display:flex;justify-content:space-between"><span>⚡ ENERGY</span><span id="energyText">1000/1000</span></div><div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div></div>
 <div class="pond" id="pond"><div class="fish-emoji" id="fish">🎣</div><div class="tap-text">TAP TO FISH!</div></div>
 <div class="shop">
@@ -52,8 +68,6 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 <div id="refModal"><div class="modal-box"><h3 style="color:#FFD700">👥 Invite Friends</h3><p style="font-size:13px;margin-top:8px;opacity:0.8">Get 500 EFC per friend!</p><input type="text" id="refLinkInput" readonly><button class="btn-copy" onclick="copyRef()">📋 COPY LINK</button><button class="btn-share" onclick="shareRef()">📤 SHARE ON WHATSAPP</button><div style="margin-top:12px;font-size:12px">Referred By: <span id="refByText" style="color:#FFD700">None</span></div><button class="btn-close" onclick="closeRef()">Close</button></div></div>
 <div id="balanceModal"><div class="modal-box"><h3 style="color:#FFD700">💰 Your Wallet</h3><div style="margin:15px 0;background:#0a0e1a;padding:15px;border-radius:12px;border:1px solid #FFD700"><div style="font-size:28px;font-weight:bold;color:#FFD700" id="walletBal">0 EFC</div><div style="font-size:12px;opacity:0.8" id="walletTier">Bronze</div></div><div style="text-align:left;font-size:13px;line-height:24px;background:#151a2d;padding:12px;border-radius:10px"><div>📊 Taps: <span id="totalTaps" style="color:#FFD700">0</span></div><div>⚡ Energy: <span id="walletEnergy" style="color:#FFD700">0</span></div><div>🎯 Next: <span id="walletNext" style="color:#FFD700">0</span></div></div><button class="btn-close" onclick="closeBalance()">Close</button></div></div>
 <div id="leaderModal"><div class="modal-box"><h3 style="color:#FFD700">🏆 Leaderboard</h3><p style="font-size:11px;opacity:0.6;margin-top:4px">Your current ranking</p><div style="margin:15px 0;text-align:left;background:#0a0e1a;border-radius:12px;padding:12px;border:2px solid #FFD700"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:bold" id="myRankText">👤 You (#1)</div><div style="font-size:11px;opacity:0.7" id="myRankTier">🥉 Bronze Fisher</div></div><div style="text-align:right"><div style="font-weight:bold;color:#FFD700;font-size:16px" id="myRankBal">0 EFC</div></div></div></div><div style="background:#151a2d;padding:12px;border-radius:10px;font-size:12px;text-align:center;line-height:22px"><div style="opacity:0.5">🥈 2nd Place — No player yet</div><div style="opacity:0.5">🥉 3rd Place — No player yet</div><div style="margin-top:8px;color:#FFD700;font-size:11px">Invite friends to compete! 👥</div></div><button class="btn-copy" onclick="closeLeaderboard();invite()" style="margin-top:12px">👥 INVITE FRIENDS</button><button class="btn-close" onclick="closeLeaderboard()">Close</button></div></div>
-
-<!-- NEW MODALS - FIXES vercel.app says -->
 <div id="appModal"><div class="modal-box"><h3 id="appModalTitle" style="color:#FFD700">Notice</h3><p id="appModalText" style="margin:15px 0;font-size:14px;line-height:20px"></p><button class="btn-copy" onclick="closeAppModal()">OK</button></div></div>
 <div id="quizModal"><div class="modal-box"><h3 style="color:#FFD700">📚 English Quiz</h3><p id="quizQ" style="margin:15px 0;font-weight:bold;font-size:15px"></p><p id="quizCount" style="font-size:12px;opacity:0.6;margin-bottom:10px"></p><button class="quiz-opt" id="qOpt1" onclick="answerQuiz(1)"></button><button class="quiz-opt" id="qOpt2" onclick="answerQuiz(2)"></button><button class="btn-close" onclick="closeQuizModal()">Close</button></div></div>
 
@@ -66,12 +80,53 @@ let maxEnergy=1000;
 const myId=tg.initDataUnsafe.user?.id||Math.floor(Math.random()*900000)+100000;
 const startParam=tg.initDataUnsafe.start_param;
 
-// Toast & Modal instead of alert/prompt
+// ===== SOUND SYSTEM =====
+let isMuted = localStorage.getItem('efc_muted') === 'true';
+let musicStarted = false;
+const waterBg = document.getElementById('waterBg');
+const bubble1 = document.getElementById('bubble1');
+const bubble2 = document.getElementById('bubble2');
+const splashSound = document.getElementById('splashSound');
+const catchSound = document.getElementById('catchSound');
+const rewardSound = document.getElementById('rewardSound');
+const coinRainSound = document.getElementById('coinRainSound');
+
+waterBg.volume = 0.25; bubble1.volume=0.7; bubble2.volume=0.6; splashSound.volume=0.8; catchSound.volume=0.8; rewardSound.volume=0.9; coinRainSound.volume=0.8;
+
+function tryStartWaterSound(){ if(musicStarted || isMuted) return; musicStarted=true; waterBg.play().catch(()=>{}); }
+function playWaterTap(){
+  if(isMuted) return;
+  tryStartWaterSound();
+  let b = Math.random()>0.5? bubble1 : bubble2;
+  b.currentTime=0; b.playbackRate=0.8+Math.random()*0.6; b.play().catch(()=>{});
+  if(Math.random()>0.7){
+    setTimeout(()=>{ splashSound.currentTime=0; splashSound.playbackRate=0.9+Math.random()*0.3; splashSound.play().catch(()=>{}); },100);
+  }
+}
+function playFishCatch(){ if(isMuted) return; catchSound.currentTime=0; catchSound.play().catch(()=>{}); if(navigator.vibrate) navigator.vibrate(60); }
+function playRewardSound(){
+  if(isMuted) return;
+  tryStartWaterSound();
+  rewardSound.currentTime=0; rewardSound.play().catch(()=>{});
+  setTimeout(()=>{ coinRainSound.currentTime=0; coinRainSound.play().catch(()=>{}); },200);
+  if(navigator.vibrate) navigator.vibrate([50,30,80]);
+}
+function toggleMute(){
+  isMuted=!isMuted; localStorage.setItem('efc_muted', isMuted);
+  document.getElementById('muteBtn').innerText = isMuted? "🔇 Muted" : "🌊 Sound On";
+  if(isMuted){ waterBg.pause(); } else { waterBg.play().catch(()=>{}); musicStarted=true; }
+}
+window.addEventListener('load',()=>{ document.getElementById('muteBtn').innerText = isMuted? "🔇 Muted" : "🌊 Sound On"; });
+
+// Toast & Modal
 function showToast(msg){let t=document.getElementById('toast');t.innerText=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2500);tg.HapticFeedback.impactOccurred('light');}
 function showAppModal(title,text){document.getElementById('appModalTitle').innerText=title;document.getElementById('appModalText').innerText=text;document.getElementById('appModal').style.display='flex';}
 function closeAppModal(){document.getElementById('appModal').style.display='none';}
 
-if(startParam&&!localStorage.getItem('efc_ref_claimed')&&startParam!=myId){balance+=500;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_ref_claimed','true');localStorage.setItem('efc_referred_by',startParam);setTimeout(()=>{showAppModal('Welcome Bonus! 🎉','Welcome via Referral! +500 EFC Bonus!');document.getElementById('bal').innerText=balance;updateLevel();},800);}
+if(startParam&&!localStorage.getItem('efc_ref_claimed')&&startParam!=myId){
+  balance+=500;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_ref_claimed','true');localStorage.setItem('efc_referred_by',startParam);
+  setTimeout(()=>{ playRewardSound(); showAppModal('Welcome Bonus! 🎉','Welcome via Referral! +500 EFC Bonus!');document.getElementById('bal').innerText=balance;updateLevel();},800);
+}
 document.getElementById('bal').innerText=balance;
 function updateEnergy(){document.getElementById('energyText').innerText=energy+'/'+maxEnergy;document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';localStorage.setItem('efc_en',energy);}
 function updateLevel(){let el=document.getElementById('levelText');let pBar=document.getElementById('levelProgress');let needEl=document.getElementById('nextNeed');if(!el)return;let name="",color="",icon="",need=0,total=1,cur=0;if(balance<100000){name="Bronze Fisher";color="#CD7F32";icon="🥉";need=100000-balance;total=100000;cur=balance;}else if(balance<1000000){name="Silver Fisher";color="#C0C0C0";icon="🥈";need=1000000-balance;total=900000;cur=balance-100000;}else if(balance<10000000){name="Gold Fisher";color="#FFD700";icon="🥇";need=10000000-balance;total=9000000;cur=balance-1000000;}else if(balance<50000000){name="Platinum Fisher";color="#00BFFF";icon="💎";need=50000000-balance;total=40000000;cur=balance-10000000;}else if(balance<200000000){name="Diamond Fisher";color="#B9F2FF";icon="👑";need=200000000-balance;total=150000000;cur=balance-50000000;}else if(balance<1000000000){name="Legendary Fisher";color="#FF4500";icon="🔥";need=1000000000-balance;total=800000000;cur=balance-200000000;}else{name="MYTHIC GOD";color="#FF00FF";icon="🐉";need=0;total=1;cur=1;}el.innerHTML=icon+" "+name;el.style.color=color;if(pBar&&needEl){let pct=Math.min(100,(cur/total*100));pBar.style.width=pct.toFixed(2)+"%";pBar.style.background="linear-gradient(90deg, "+color+", #fff)";needEl.innerText=need>0?need.toLocaleString()+" EFC to next":"MAX LEVEL!";}document.getElementById('miniBal').innerText=balance.toLocaleString()+" EFC";document.getElementById('miniTier').innerText=icon+" "+name;document.getElementById('miniTier').style.color=color;document.getElementById('myRankTier').innerText=icon+" "+name;let rank=balance>50000?'#1':balance>10000?'#3':balance>1000?'#8':'#15';document.getElementById('miniRank').innerText='You: '+rank;document.getElementById('myRankText').innerText='👤 You ('+rank+')';document.getElementById('myRankBal').innerText=balance.toLocaleString()+" EFC";}
@@ -81,23 +136,47 @@ function showFish(){setActive('navFish');window.scrollTo({top:0,behavior:'smooth
 let fishScale=1;let fishEl=document.getElementById('fish');
 document.getElementById('pond').addEventListener('click',tap);
 document.getElementById('pond').addEventListener('touchstart',function(e){e.preventDefault();tap(e);},{passive:false});
-function tap(e){if(energy<=0){showToast('⚡ No energy! Invite friends!');return;}energy--;balance+=perTap;if(Math.random()>0.7)balance+=2;let taps=parseInt(localStorage.getItem('efc_taps')||'0')+1;localStorage.setItem('efc_taps',taps);localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_en',energy);document.getElementById('bal').innerText=balance;updateEnergy();updateLevel();fishScale+=0.15;if(fishScale>2.2)fishScale=2.2;fishEl.style.transform='scale('+fishScale+')';clearTimeout(fishEl.shrinkTimer);fishEl.shrinkTimer=setTimeout(function(){fishScale=1;fishEl.style.transform='scale(1)';},700);let x=e.touches?e.touches[0].clientX:e.clientX;let y=e.touches?e.touches[0].clientY:e.clientY;let el2=document.createElement('div');el2.className='coin-pop';el2.style.left=(x-20)+'px';el2.style.top=(y-30)+'px';el2.innerText='+'+perTap+' EFC';document.body.appendChild(el2);setTimeout(function(){el2.remove();},800);tg.HapticFeedback.impactOccurred('light');}
+function tap(e){
+  if(energy<=0){showToast('⚡ No energy! Invite friends!');return;}
+  playWaterTap(); // <-- পানির বুদবুদ
+  energy--;balance+=perTap;if(Math.random()>0.7){balance+=2; playFishCatch();} // বড় মাছ পেলে ছলাৎ
+  let taps=parseInt(localStorage.getItem('efc_taps')||'0')+1;localStorage.setItem('efc_taps',taps);localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_en',energy);document.getElementById('bal').innerText=balance;updateEnergy();updateLevel();fishScale+=0.15;if(fishScale>2.2)fishScale=2.2;fishEl.style.transform='scale('+fishScale+')';clearTimeout(fishEl.shrinkTimer);fishEl.shrinkTimer=setTimeout(function(){fishScale=1;fishEl.style.transform='scale(1)';},700);let x=e.touches?e.touches[0].clientX:e.clientX;let y=e.touches?e.touches[0].clientY:e.clientY;let el2=document.createElement('div');el2.className='coin-pop';el2.style.left=(x-20)+'px';el2.style.top=(y-30)+'px';el2.innerText='+'+perTap+' EFC';document.body.appendChild(el2);setTimeout(function(){el2.remove();},800);tg.HapticFeedback.impactOccurred('light');
+}
 function showBalance(){document.getElementById('walletBal').innerText=balance.toLocaleString()+' EFC';document.getElementById('walletTier').innerText=document.getElementById('levelText').innerText;document.getElementById('walletEnergy').innerText=energy+'/'+maxEnergy;document.getElementById('walletNext').innerText=document.getElementById('nextNeed').innerText;document.getElementById('totalTaps').innerText=localStorage.getItem('efc_taps')||'0';document.getElementById('balanceModal').style.display='flex';}
 function closeBalance(){document.getElementById('balanceModal').style.display='none';}
 function showLeaderboard(){updateLevel();document.getElementById('leaderModal').style.display='flex';}
 function closeLeaderboard(){document.getElementById('leaderModal').style.display='none';}
-function buyRod(){if(balance>=500){balance-=500;perTap=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_per',perTap);document.getElementById('bal').innerText=balance;updateLevel();showAppModal('Unlocked! 🎣','Iron Rod Unlocked! Now 2x Income!');}else showToast('❌ Need 500 EFC!');}
+function buyRod(){
+  if(balance>=500){
+    playRewardSound(); // <-- BUY SOUND
+    balance-=500;perTap=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_per',perTap);document.getElementById('bal').innerText=balance;updateLevel();showAppModal('Unlocked! 🎣','Iron Rod Unlocked! Now 2x Income!');
+  }else showToast('❌ Need 500 EFC!');
+}
 
 let currentQuiz=null;
 function showQuiz(){setActive('navLearn');const quizList=[{q:"Opposite of Hot?",o1:"Cold",o2:"Hot",ans:1},{q:"Plural of Book?",o1:"Books",o2:"Bookes",ans:1},{q:"Sun rises in ___?",o1:"East",o2:"West",ans:1},{q:"What is 2 + 2?",o1:"4",o2:"5",ans:1},{q:"Letters in Alphabet?",o1:"26",o2:"24",ans:1},{q:"Opposite of Big?",o1:"Small",o2:"Large",ans:1}];const today=new Date().toDateString();let lastDate=localStorage.getItem('efc_quiz_date');let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');if(lastDate!==today){count=0;localStorage.setItem('efc_quiz_date',today);localStorage.setItem('efc_quiz_count','0');}if(count>=10){showAppModal('Daily Limit!','Limit 10/10 done! Come back tomorrow!');setActive('navFish');return;}currentQuiz=quizList[Math.floor(Math.random()*quizList.length)];document.getElementById('quizQ').innerText=currentQuiz.q;document.getElementById('qOpt1').innerText='1. '+currentQuiz.o1;document.getElementById('qOpt2').innerText='2. '+currentQuiz.o2;document.getElementById('quizCount').innerText='Question '+(count+1)+'/10 Today';document.getElementById('quizModal').style.display='flex';}
-function answerQuiz(choice){let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');let today=new Date().toDateString();if(choice==currentQuiz.ans){balance+=50;count++;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_quiz_count',count);localStorage.setItem('efc_quiz_date',today);updateLevel();closeQuizModal();showToast('✅ Correct! +50 EFC ('+count+'/10)');}else{closeQuizModal();showToast('❌ Wrong! Try next!');}setActive('navFish');}
+function answerQuiz(choice){
+  let count=parseInt(localStorage.getItem('efc_quiz_count')||'0');let today=new Date().toDateString();
+  if(choice==currentQuiz.ans){
+    playRewardSound(); // <-- QUIZ CORRECT SOUND
+    balance+=50;count++;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_quiz_count',count);localStorage.setItem('efc_quiz_date',today);updateLevel();closeQuizModal();showToast('✅ Correct! +50 EFC ('+count+'/10)');
+  }else{
+    closeQuizModal();showToast('❌ Wrong! Try next!');
+  }setActive('navFish');
+}
 function closeQuizModal(){document.getElementById('quizModal').style.display='none';}
 
 function invite(){setActive('navFriends');let link='https://t.me/EFC_FISH_BOT?start='+myId;document.getElementById('refLinkInput').value=link;document.getElementById('refByText').innerText=localStorage.getItem('efc_referred_by')||'None';document.getElementById('refModal').style.display='flex';}
 function closeRef(){document.getElementById('refModal').style.display='none';setActive('navFish');}
 function copyRef(){navigator.clipboard.writeText(document.getElementById('refLinkInput').value).then(()=>showToast('✅ Link Copied!'));}
 function shareRef(){let link=document.getElementById('refLinkInput').value;window.open('https://wa.me/?text='+encodeURIComponent('🎣 Join EFC Fishing & Earn! '+link),'_blank');}
-function earn(){setActive('navEarn');let last=localStorage.getItem('efc_daily_date');let today=new Date().toDateString();if(last===today){showAppModal('Already Claimed! 🎁','You already claimed today! Come back tomorrow!');setActive('navFish');return;}balance+=100;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_daily_date',today);updateLevel();showAppModal('Daily Bonus! 🎁','Daily +100 EFC Claimed!');setActive('navFish');}
+function earn(){
+  setActive('navEarn');
+  let last=localStorage.getItem('efc_daily_date');let today=new Date().toDateString();
+  if(last===today){showAppModal('Already Claimed! 🎁','You already claimed today! Come back tomorrow!');setActive('navFish');return;}
+  playRewardSound(); // <-- DAILY REWARD SOUND FIX
+  balance+=100;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_daily_date',today);updateLevel();showAppModal('Daily Bonus! 🎁','Daily +100 EFC Claimed!');setActive('navFish');
+}
 setInterval(function(){if(energy<maxEnergy){energy++;updateEnergy();}},3000);
 </script>
 </body>
