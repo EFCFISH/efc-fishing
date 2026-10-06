@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EFC Fishing Frenzy</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0a0e1a;color:#fff;overflow:hidden;height:100vh}
+.header{padding:15px;display:flex;justify-content:space-between;align-items:center;background:#151a2d}
+.balance{background:linear-gradient(90deg,#FFD700,#FFA500);padding:10px 20px;border-radius:20px;color:#000;font-weight:bold}
+.energy-box{margin:10px 20px;background:#1e2540;border-radius:15px;padding:12px}
+.energy-bar{height:12px;background:#333;border-radius:10px;overflow:hidden;margin-top:8px}
+.energy-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);width:85%;transition:0.3s}
+.pond{margin:20px;height:38vh;background:radial-gradient(circle at 50% 30%,#1a3a5a,#0a1a2a);border-radius:25px;position:relative;display:flex;align-items:center;justify-content:center;border:2px solid #FFD700;cursor:pointer;user-select:none}
+.fish-emoji{font-size:80px;animation:float 2s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.tap-text{position:absolute;bottom:20px;background:rgba(0,0,0,0.7);padding:8px 18px;border-radius:20px;font-weight:bold;color:#FFD700}
+.coin-pop{position:absolute;color:#FFD700;font-weight:bold;font-size:22px;animation:pop 0.8s forwards;pointer-events:none}
+@keyframes pop{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-80px) scale(1.5);opacity:0}}
+.shop{display:flex;gap:12px;padding:0 20px;margin-top:10px}
+.card{flex:1;background:#1e2540;border:1px solid #FFD700;border-radius:15px;padding:15px;text-align:center}
+.card button{background:#FFD700;border:none;padding:8px 15px;border-radius:10px;font-weight:bold;margin-top:10px;width:100%;cursor:pointer}
+.nav{position:fixed;bottom:0;width:100%;background:#151a2d;display:flex;justify-content:space-around;padding:12px 0;border-top:1px solid #333}
+.nav div{text-align:center;opacity:0.6;cursor:pointer}
+.nav div.active{opacity:1;color:#FFD700}
+</style>
+</head>
+<body>
+<div class="header">
+<div><b>EFC Fishing Frenzy</b><br><small style="color:#FFD700">Level 3 Fisher</small></div>
+<div class="balance">💰 <span id="bal">1250</span> EFC</div>
+</div>
+
+<div class="energy-box">
+<div style="display:flex;justify-content:space-between"><span>⚡ ENERGY</span><span id="energyText">1000/1000</span></div>
+<div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div>
+</div>
+
+<div class="pond" id="pond">
+<div class="fish-emoji" id="fish">🎣</div>
+<div class="tap-text">TAP TO FISH!</div>
+</div>
+
+<div class="shop">
+<div class="card">
+<div style="font-size:30px">🪝</div>
+<b>Iron Rod</b><br><small>2x Earning</small>
+<button onclick="buyRod()">500 EFC - BUY</button>
+</div>
+<div class="card">
+<div style="font-size:30px">🏆</div>
+<b>Leaderboard</b><br><small>You: #24</small>
+<div style="text-align:left;margin-top:8px;font-size:12px">
+🥇 AquaWhale - 8900<br>🥈 HookMaster - 5201<br>🥉 ReelKing - 3100
+</div>
+</div>
+</div>
+
+<div class="nav">
+<div onclick="showQuiz()">📚<br>Learn</div>
+<div class="active">🐟<br>Fish</div>
+<div onclick="invite()">👥<br>Friends</div>
+<div onclick="earn()">🎁<br>Earn</div>
+</div>
+
+<script>
+let tg = window.Telegram.WebApp; tg.expand();
+let balance = parseInt(localStorage.getItem('efc_bal')||'1250');
+let energy = parseInt(localStorage.getItem('efc_en')||'1000');
+let perTap = parseInt(localStorage.getItem('efc_per')||'1');
+let maxEnergy = 1000;
+document.getElementById('bal').innerText=balance;
+updateEnergy();
+
+document.getElementById('pond').addEventListener('touchstart', tap);
+document.getElementById('pond').addEventListener('click', tap);
+
+function tap(e){
+if(energy<=0){alert('Energy শেষ! 1 ঘন্টা পর ফিরে আসুন বা বন্ধু Invite করুন!'); return;}
+energy--; balance+=perTap;
+if(Math.random()>0.7) balance+=2; // Bonus fish
+localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_en',energy);
+document.getElementById('bal').innerText=balance;
+updateEnergy();
+showCoin(e);
+tg.HapticFeedback.impactOccurred('light');
+}
+
+function showCoin(e){
+let x = e.touches? e.touches[0].clientX : e.clientX;
+let y = e.touches? e.touches[0].clientY : e.clientY;
+let el = document.createElement('div'); el.className='coin-pop';
+el.style.left=x+'px'; el.style.top=y+'px'; el.innerText='+'+perTap+' EFC';
+document.body.appendChild(el); setTimeout(()=>el.remove(),800);
+}
+
+function updateEnergy(){
+document.getElementById('energyText').innerText=energy+'/'+maxEnergy;
+document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';
+localStorage.setItem('efc_en',energy);
+}
+
+function buyRod(){
+if(balance>=500){balance-=500; perTap=2;
+localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_per',perTap);
+document.getElementById('bal').innerText=balance; alert('🎉 Iron Rod Unlocked! এখন 2x Income!');
+}else alert('500 EFC লাগবে! আরো মাছ ধরুন!');
+}
+
+function showQuiz(){
+let ans = prompt('📚 ENGLISH QUIZ: Apple এর বাংলা কি?\n1. আপেল\n2. কমলা\nসঠিক উত্তর লিখুন (1/2)');
+if(ans=='1'){balance+=50; document.getElementById('bal').innerText=balance; localStorage.setItem('efc_bal',balance); alert('✅ সঠিক! +50 EFC Bonus!');}
+else alert('❌ ভুল!');
+}
+
+function invite(){
+let link = 'https://t.me/YourBot?start='+tg.initDataUnsafe.user?.id;
+alert('👥 বন্ধুকে Invite করুন:\n'+link+'\n\nপ্রতি বন্ধুতে 500 EFC + 10% Commission!');
+if(navigator.share) navigator.share({title:'EFC Fish',url:link});
+}
+
+function earn(){
+balance+=100; document.getElementById('bal').innerText=balance; localStorage.setItem('efc_bal',balance);
+alert('🎁 Daily Reward Claimed! +100 EFC');
+}
+
+// Auto refill 1 per 3 sec
+setInterval(()=>{if(energy<maxEnergy){energy++; updateEnergy();}},3000);
+</script>
+</body>
+</html>
