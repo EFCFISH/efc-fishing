@@ -66,6 +66,20 @@ let balance = parseInt(localStorage.getItem('efc_bal')||'1250');
 let energy = parseInt(localStorage.getItem('efc_en')||'1000');
 let perTap = parseInt(localStorage.getItem('efc_per')||'1');
 let maxEnergy = 1000;
+
+// === REFERRAL SYSTEM ADDED ===
+const myId = tg.initDataUnsafe.user?.id;
+const startParam = tg.initDataUnsafe.start_param;
+const refClaimed = localStorage.getItem('efc_ref_claimed');
+
+if(startParam &&!refClaimed && startParam!= myId){
+  balance += 500;
+  localStorage.setItem('efc_bal', balance);
+  localStorage.setItem('efc_ref_claimed', 'true');
+  localStorage.setItem('efc_referred_by', startParam);
+  setTimeout(()=>{ alert('Welcome via Referral! +500 EFC Bonus Added!'); document.getElementById('bal').innerText=balance; }, 800);
+}
+
 document.getElementById('bal').innerText=balance;
 updateEnergy();
 document.getElementById('pond').addEventListener('touchstart', tap);
@@ -176,6 +190,85 @@ function showQuiz(){
     {q:"What is 8 + 8?", o1:"16", o2:"18", ans:"1"},
     {q:"Opposite of Begin?", o1:"End", o2:"Start", ans:"1"},
     {q:"Which is a country?", o1:"Japan", o2:"Dhaka", ans:"1"},
+    {q:"What do we see with?", o1:"Eyes", o2:"Nose", ans:"1"},
+    {q:"Opposite of Hard?", o1:"Soft", o2:"Tough", ans:"1"},
+    {q:"What is 12 / 3?", o1:"4", o2:"6", ans:"1"},
+    {q:"Which is fast?", o1:"Cheetah", o2:"Turtle", ans:"1"},
+    {q:"What is the opposite of Come?", o1:"Go", o2:"Arrive", ans:"1"},
+    {q:"Which is a grain?", o1:"Rice", o2:"Milk", ans:"1"},
+    {q:"What is 15 - 5?", o1:"10", o2:"5", ans:"1"},
+    {q:"Opposite of Full?", o1:"Empty", o2:"Filled", ans:"1"},
+    {q:"What is the opposite of First?", o1:"Last", o2:"Second", ans:"1"},
+    {q:"Which is a metal?", o1:"Iron", o2:"Wood", ans:"1"},
+    {q:"What is 4 x 5?", o1:"20", o2:"25", ans:"1"},
+    {q:"Opposite of Clean?", o1:"Dirty", o2:"Neat", ans:"1"},
+    {q:"What is the opposite of Right?", o1:"Left", o2:"Correct", ans:"1"},
+    {q:"Which is a sweet?", o1:"Sugar", o2:"Salt", ans:"1"},
+    {q:"What is 50 / 5?", o1:"10", o2:"15", ans:"1"},
+    {q:"Opposite of Young?", o1:"Old", o2:"New", ans:"1"},
+    {q:"What is the opposite of Near?", o1:"Far", o2:"Close", ans:"1"},
+    {q:"Which is a wild animal?", o1:"Tiger", o2:"Cow", ans:"1"},
+    {q:"What is 11 + 9?", o1:"20", o2:"21", ans:"1"},
+    {q:"Opposite of Thick?", o1:"Thin", o2:"Fat", ans:"1"},
+    {q:"Which helps to fly?", o1:"Wings", o2:"Legs", ans:"1"},
+    {q:"What is 18 / 2?", o1:"9", o2:"8", ans:"1"},
+    {q:"Opposite of Dry?", o1:"Wet", o2:"Hot", ans:"1"},
+    {q:"What is the tallest animal?", o1:"Giraffe", o2:"Elephant", ans:"1"}
+  ];
+  const today = new Date().toDateString();
+  const lastDate = localStorage.getItem('efc_quiz_date');
+  let count = parseInt(localStorage.getItem('efc_quiz_count') || '0');
+  if(lastDate!== today){
+    count = 0;
+    localStorage.setItem('efc_quiz_date', today);
+    localStorage.setItem('efc_quiz_count', '0');
+  }
+  if(count >= 10){
+    alert('Daily limit reached! You completed 10 quizzes today. Come back tomorrow!');
+    return;
+  }
+  const randomIndex = Math.floor(Math.random() * quizList.length);
+  const selected = quizList[randomIndex];
+  let ans = prompt(`ENGLISH QUIZ (${count+1}/10 Today): ${selected.q}\n1. ${selected.o1}\n2. ${selected.o2}\nType your answer (1/2)`);
+  if(ans == selected.ans){
+    balance+=50;
+    count++;
+    document.getElementById('bal').innerText=balance;
+    localStorage.setItem('efc_bal',balance);
+    localStorage.setItem('efc_quiz_count', count.toString());
+    localStorage.setItem('efc_quiz_date', today);
+    alert(`Correct! +50 EFC Bonus! (${count}/10 Today Completed)`);
+  } else {
+    alert('Wrong answer! Try again!');
+  }
+}
+function invite(){
+  const myId = tg.initDataUnsafe.user?.id || '0';
+  let link = `https://t.me/EFC_FISH_BOT?start=${myId}`;
+  let invited = parseInt(localStorage.getItem('efc_invited')||'0');
+  let referredBy = localStorage.getItem('efc_referred_by') || 'None';
+  alert(`Your Referral Link:\n${link}\n\nInvited: ${invited} Friends\nReferred By: ${referredBy}\n\nReward: 500 EFC per referral!`);
+  if(navigator.share){ navigator.share({title:'EFC Fishing Frenzy', url:link}); }
+  else { navigator.clipboard.writeText(link); }
+}
+function earn(){
+  const lastClaim = localStorage.getItem('efc_daily_date');
+  const today = new Date().toDateString();
+  if(lastClaim === today){
+    alert('Already claimed today! Come back tomorrow!');
+    return;
+  }
+  balance+=100;
+  document.getElementById('bal').innerText=balance;
+  localStorage.setItem('efc_bal',balance);
+  localStorage.setItem('efc_daily_date', today);
+  alert('Daily Reward Claimed! +100 EFC');
+  tg.HapticFeedback.notificationOccurred('success');
+}
+setInterval(()=>{if(energy<maxEnergy){energy++; updateEnergy();}},3000);
+</script>
+</body>
+</html>"1"},
     {q:"What do we see with?", o1:"Eyes", o2:"Nose", ans:"1"},
     {q:"Opposite of Hard?", o1:"Soft", o2:"Tough", ans:"1"},
     {q:"What is 12 / 3?", o1:"4", o2:"6", ans:"1"},
