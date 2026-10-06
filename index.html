@@ -32,17 +32,14 @@ body{background:#0a0e1a;color:#fff;overflow:hidden;height:100vh}
 <div><b>EFC Fishing Frenzy</b><br><small style="color:#FFD700">Level 3 Fisher</small></div>
 <div class="balance">💰 <span id="bal">1250</span> EFC</div>
 </div>
-
 <div class="energy-box">
 <div style="display:flex;justify-content:space-between"><span>⚡ ENERGY</span><span id="energyText">1000/1000</span></div>
 <div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div>
 </div>
-
 <div class="pond" id="pond">
 <div class="fish-emoji" id="fish">🎣</div>
 <div class="tap-text">TAP TO FISH!</div>
 </div>
-
 <div class="shop">
 <div class="card">
 <div style="font-size:30px">🪝</div>
@@ -57,14 +54,12 @@ body{background:#0a0e1a;color:#fff;overflow:hidden;height:100vh}
 </div>
 </div>
 </div>
-
 <div class="nav">
 <div onclick="showQuiz()">📚<br>Learn</div>
 <div class="active">🐟<br>Fish</div>
 <div onclick="invite()">👥<br>Friends</div>
 <div onclick="earn()">🎁<br>Earn</div>
 </div>
-
 <script>
 let tg = window.Telegram.WebApp; tg.expand();
 let balance = parseInt(localStorage.getItem('efc_bal')||'1250');
@@ -73,21 +68,18 @@ let perTap = parseInt(localStorage.getItem('efc_per')||'1');
 let maxEnergy = 1000;
 document.getElementById('bal').innerText=balance;
 updateEnergy();
-
 document.getElementById('pond').addEventListener('touchstart', tap);
 document.getElementById('pond').addEventListener('click', tap);
-
 function tap(e){
 if(energy<=0){alert('Energy শেষ! 1 ঘন্টা পর ফিরে আসুন বা বন্ধু Invite করুন!'); return;}
 energy--; balance+=perTap;
-if(Math.random()>0.7) balance+=2; // Bonus fish
+if(Math.random()>0.7) balance+=2;
 localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_en',energy);
 document.getElementById('bal').innerText=balance;
 updateEnergy();
 showCoin(e);
 tg.HapticFeedback.impactOccurred('light');
 }
-
 function showCoin(e){
 let x = e.touches? e.touches[0].clientX : e.clientX;
 let y = e.touches? e.touches[0].clientY : e.clientY;
@@ -95,38 +87,41 @@ let el = document.createElement('div'); el.className='coin-pop';
 el.style.left=x+'px'; el.style.top=y+'px'; el.innerText='+'+perTap+' EFC';
 document.body.appendChild(el); setTimeout(()=>el.remove(),800);
 }
-
 function updateEnergy(){
 document.getElementById('energyText').innerText=energy+'/'+maxEnergy;
 document.getElementById('energyFill').style.width=(energy/maxEnergy*100)+'%';
 localStorage.setItem('efc_en',energy);
 }
-
 function buyRod(){
 if(balance>=500){balance-=500; perTap=2;
 localStorage.setItem('efc_bal',balance); localStorage.setItem('efc_per',perTap);
 document.getElementById('bal').innerText=balance; alert('🎉 Iron Rod Unlocked! এখন 2x Income!');
 }else alert('500 EFC লাগবে! আরো মাছ ধরুন!');
 }
-
 function showQuiz(){
 let ans = prompt('📚 ENGLISH QUIZ: Apple এর বাংলা কি?\n1. আপেল\n2. কমলা\nসঠিক উত্তর লিখুন (1/2)');
 if(ans=='1'){balance+=50; document.getElementById('bal').innerText=balance; localStorage.setItem('efc_bal',balance); alert('✅ সঠিক! +50 EFC Bonus!');}
 else alert('❌ ভুল!');
 }
-
 function invite(){
-let link = 'https://t.me/YourBot?start='+tg.initDataUnsafe.user?.id;
+let link = 'https://t.me/EFC_FISH_BOT?start='+tg.initDataUnsafe.user?.id;
 alert('👥 বন্ধুকে Invite করুন:\n'+link+'\n\nপ্রতি বন্ধুতে 500 EFC + 10% Commission!');
 if(navigator.share) navigator.share({title:'EFC Fish',url:link});
 }
-
 function earn(){
-balance+=100; document.getElementById('bal').innerText=balance; localStorage.setItem('efc_bal',balance);
-alert('🎁 Daily Reward Claimed! +100 EFC');
+  const lastClaim = localStorage.getItem('efc_daily_date');
+  const today = new Date().toDateString();
+  if(lastClaim === today){
+    alert('⛔ আজকের Reward নেওয়া হয়ে গেছে! কাল আবার আসুন! 🕒');
+    return;
+  }
+  balance+=100;
+  document.getElementById('bal').innerText=balance;
+  localStorage.setItem('efc_bal',balance);
+  localStorage.setItem('efc_daily_date', today);
+  alert('🎁 Daily Reward Claimed! +100 EFC');
+  tg.HapticFeedback.notificationOccurred('success');
 }
-
-// Auto refill 1 per 3 sec
 setInterval(()=>{if(energy<maxEnergy){energy++; updateEnergy();}},3000);
 </script>
 </body>
