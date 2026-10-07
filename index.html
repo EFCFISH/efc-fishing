@@ -299,6 +299,45 @@ function earn(){ setActive('navEarn'); let last=localStorage.getItem('efc_daily_
 setInterval(function(){if(energy<maxEnergy){energy++;updateEnergy();}},3000);
 spawnFish();
 window.addEventListener('load',()=>{ document.getElementById('muteBtn').innerText=isMuted?"🔇 Muted":"🌊 Sound On"; });
+// Check if user can claim
+function checkForRealReward() {
+  let balance = parseInt(localStorage.getItem('efc_balance') || 0);
+  let alreadyClaimed = localStorage.getItem('real_claimed');
+  
+  if (balance >= 10000 && !alreadyClaimed) {
+    document.getElementById('claim-section').style.display = 'block';
+  }
+}
+
+// Call this function every time user catches fish
+// Example: after balance update, call checkForRealReward();
+
+// Claim Function
+function claimRealToken() {
+  let wallet = document.getElementById('walletInput').value.trim();
+  if(wallet.length < 32) {
+    alert('Invalid Wallet Address');
+    return;
+  }
+  // Send wallet to your admin via Telegram Bot
+  let botToken = "YOUR_BOT_TOKEN";
+  let adminId = "YOUR_TELEGRAM_ID";
+  let msg = `New Claim Request:\nWallet: ${wallet}\nAmount: 100 EFC`;
+
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${adminId}&text=${encodeURIComponent(msg)}`)
+  .then(() => {
+    localStorage.setItem('real_claimed', 'true');
+    alert('Claim Successful! You will receive 100 EFC within 24 hours.');
+    document.getElementById('claim-section').style.display = 'none';
+  });
+  }
 </script>
+  <div id="claim-section" style="display:none; text-align:center; padding:20px; background:#111; border:1px solid gold; border-radius:12px;">
+  <h3>You Reached 10,000 Coins!</h3>
+  <p>Enter your Solana wallet to claim 100 Real Tokens</p>
+  <input id="walletInput" type="text" placeholder="Enter Solana Wallet Address" style="width:90%; padding:12px; border-radius:8px;">
+  <br>
+  <button onclick="claimRealToken()" style="margin-top:15px; padding:12px 25px; background:gold; color:black; font-weight:bold; border:none; border-radius:8px; cursor:pointer;">CLAIM 100 EFC</button>
+</div>
 </body>
                                                                                                                                                                       </html>
