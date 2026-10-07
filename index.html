@@ -314,14 +314,16 @@ window.addEventListener('load',()=>{
 });
 
 // Check if user can claim
+// Check if user can claim
 function checkForRealReward() {
-  let balance = parseInt(localStorage.getItem('efc_balance') || localStorage.getItem('efc_bal') || localStorage.getItem('balance') || '1000000000');
-  let alreadyClaimed = localStorage.getItem('rea
   localStorage.setItem('efc_balance', '1000000000');
   localStorage.setItem('efc_bal', '1000000000');
   localStorage.setItem('balance', '1000000000');
   localStorage.setItem('coins', '1000000000');
+  let balance = 1000000000;
+  let alreadyClaimed = localStorage.getItem('alreadyClaimed');
   if (balance >= 10000 && !alreadyClaimed) {
+    document.getElementById('claim-section').style.display = 'block';
   }
 }
 </script>
