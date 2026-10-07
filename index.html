@@ -294,24 +294,43 @@ function shareOn(platform){
     }
   }
 }
+function earn(){ 
+  setActive('navEarn');
+}
 
-function earn(){ setActive('navEarn'); let last=localStorage.getItem('efc_daily_date');let today=new Date().toDateString(); if(last===today){showAppModal('Already Claimed!','Come back tomorrow!');setActive('navFish');return;} playRewardSound(); balance+=100;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_daily_date',today);updateLevel();showAppModal('Daily Bonus!','+100 EFC Claimed!');setActive('navFish'); }
-setInterval(function(){if(energy<maxEnergy){energy++;updateEnergy();}},3000);
-spawnFish();
-window.addEventListener('load',()=>{ document.getElementById('muteBtn').innerText=isMuted?"🔇 Muted":"🌊 Sound On"; });
+setInterval(function(){
+  if(energy < maxEnergy){
+    energy++;
+    if(typeof updateUI === 'function') updateUI();
+  }
+}, 2000);
+
+function spawnFish(){
+  // তোমার মাছ আসার কোডটা এখানে থাকবে
+}
+
+window.addEventListener('load',()=>{
+  checkForRealReward();
+});
+
 // Check if user can claim
 function checkForRealReward() {
   let balance = parseInt(localStorage.getItem('efc_balance') || 0);
   let alreadyClaimed = localStorage.getItem('real_claimed');
-  
   if (balance >= 10000 && !alreadyClaimed) {
     document.getElementById('claim-section').style.display = 'block';
   }
 }
-
-// Call this function every time user catches fish
-// Example: after balance update, call checkForRealReward();
 </script>
+
+<div id="claim-section" style="display:none; text-align:center; padding:20px; background:#111; border:1px solid gold; border-radius:12px; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:999; width:90%;">
+  <h3>You Reached 10,000 Coins!</h3>
+  <p>Enter your Solana wallet to claim 100 EFC</p>
+  <input id="walletInput" type="text" placeholder="Solana Wallet" style="width:90%; padding:12px; border-radius:8px; border:none;">
+  <br>
+  <button onclick="claimRealToken()" style="margin-top:15px; padding:12px 25px; background:gold; color:black; font-weight:bold; border:none; border-radius:8px; cursor:pointer;">CLAIM 100 EFC</button>
+</div>
+</body>
   <script src="claim.js"></script>
   <div id="claim-section" style="display:none; text-align:center; padding:20px; background:#111; border:1px solid gold; border-radius:12px;">
   <h3>You Reached 10,000 Coins!</h3>
@@ -319,6 +338,7 @@ function checkForRealReward() {
   <input id="walletInput" type="text" placeholder="Enter Solana Wallet Address" style="width:90%; padding:12px; border-radius:8px;">
   <br>
   <button onclick="claimRealToken()" style="margin-top:15px; padding:12px 25px; background:gold; color:black; font-weight:bold; border:none; border-radius:8px; cursor:pointer;">CLAIM 100 EFC</button>
-</div>
+</div>div
+  <script src="claim.js"></script>
 </body>
                                                                                                                                                                       </html>
