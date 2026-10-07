@@ -311,27 +311,8 @@ function checkForRealReward() {
 
 // Call this function every time user catches fish
 // Example: after balance update, call checkForRealReward();
-
-// Claim Function
-function claimRealToken() {
-  let wallet = document.getElementById('walletInput').value.trim();
-  if(wallet.length < 32) {
-    alert('Invalid Wallet Address');
-    return;
-  }
-  // Send wallet to your admin via Telegram Bot
-  let botToken = "8651907097:AAFVyWZVGj8JApMTEpgf3rgspeYZ-2ltks8";
-  let adminId = "@EFC_FISH_BOT";
-  let msg = `New Claim Request:\nWallet: ${wallet}\nAmount: 100 EFC`;
-
-  fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${adminId}&text=${encodeURIComponent(msg)}`)
-  .then(() => {
-    localStorage.setItem('real_claimed', 'true');
-    alert('Claim Successful! You will receive 100 EFC within 24 hours.');
-    document.getElementById('claim-section').style.display = 'none';
-  });
-  }
 </script>
+  <script src="claim.js"></script>
   <div id="claim-section" style="display:none; text-align:center; padding:20px; background:#111; border:1px solid gold; border-radius:12px;">
   <h3>You Reached 10,000 Coins!</h3>
   <p>Enter your Solana wallet to claim 100 Real Tokens</p>
