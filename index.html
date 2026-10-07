@@ -179,11 +179,48 @@ function closeBalance(){document.getElementById('balanceModal').style.display='n
 function showLeaderboard(){updateLevel();document.getElementById('leaderModal').style.display='flex';}
 function closeLeaderboard(){document.getElementById('leaderModal').style.display='none';}
 function buyRod(){ if(balance>=500){ playRewardSound(); balance-=500;perTap=2;localStorage.setItem('efc_bal',balance);localStorage.setItem('efc_per',perTap);document.getElementById('bal').innerText=balance;updateLevel();showAppModal('Unlocked! 🎣','Iron Rod 2x!'); }else showToast('❌ Need 500 EFC!'); }
-let currentQuiz=null;
-function showQuiz(){setActive('navLearn');currentQuiz={q:"Opposite of Hot?",o1:"Cold",o2:"Hot",ans:1};document.getElementById('quizQ').innerText=currentQuiz.q;document.getElementById('qOpt1').innerText=currentQuiz.o1;document.getElementById('qOpt2').innerText=currentQuiz.o2;document.getElementById('quizModal').style.display='flex';}
-function answerQuiz(c){ if(c==currentQuiz.ans){ balance+=50;document.getElementById('bal').innerText=balance;localStorage.setItem('efc_bal',balance);updateLevel(); } document.getElementById('quizModal').style.display='none'; setActive('navFish'); }
-function closeQuizModal(){document.getElementById('quizModal').style.display='none';}
-
+const allQs = [
+{q:"Opposite of Hot?",o1:"Cold",o2:"Hot",ans:1},
+{q:"Bitcoin is?",o1:"Crypto currency",o2:"A Fish",ans:1},
+{q:"Solana is?",o1:"Fast Blockchain",o2:"Slow Fish",ans:1},
+{q:"EFC full form?",o1:"English Fish Coin",o2:"Eat Fish Curry",ans:1},
+{q:"Cat says?",o1:"Meow",o2:"Woof",ans:1},
+{q:"Tap to Earn?",o1:"Yes",o2:"No",ans:1},
+{q:"Water is?",o1:"Wet",o2:"Dry",ans:1},
+{q:"Sun rises in?",o1:"East",o2:"West",ans:1},
+{q:"Opposite of Big?",o1:"Small",o2:"Big",ans:1},
+{q:"Fish lives in?",o1:"Water",o2:"Sky",ans:1},
+{q:"Gold is?",o1:"Valuable",o2:"Worthless",ans:1},
+{q:"2 + 2 = ?",o1:"4",o2:"5",ans:1},
+{q:"English Fish Coin is fun?",o1:"Yes",o2:"No",ans:1},
+{q:"Learn & Earn?",o1:"Yes",o2:"No",ans:1},
+{q:"Fishing needs?",o1:"Rod",o2:"Spoon",ans:1},
+{q:"Opposite of Day?",o1:"Night",o2:"Light",ans:1},
+{q:"Dog says?",o1:"Bark",o2:"Meow",ans:2},
+{q:"Apple is a?",o1:"Fruit",o2:"Animal",ans:1},
+{q:"Telegram bot is?",o1:"Online",o2:"Offline",ans:1},
+{q:"Past of Go?",o1:"Went",o2:"Gone",ans:1},
+{q:"Plural of Fish?",o1:"Fish",o2:"Fishes",ans:1},
+{q:"Opposite of Happy?",o1:"Sad",o2:"Happy",ans:1},
+{q:"I ___ a student",o1:"am",o2:"is",ans:1},
+{q:"He ___ playing",o1:"is",o2:"are",ans:1},
+{q:"Crypto wallet is?",o1:"Safe",o2:"Food",ans:1},
+{q:"Solana token is?",o1:"SOL",o2:"BTC",ans:1},
+{q:"Pump.fun is on?",o1:"Solana",o2:"Bitcoin",ans:1},
+{q:"Fast chain?",o1:"Solana",o2:"Snail",ans:1},
+{q:"Earn by tapping?",o1:"Yes",o2:"No",ans:1},
+{q:"Bronze Fisher is level?",o1:"Beginner",o2:"Pro",ans:1},
+{q:"Iron Rod gives?",o1:"2x Earning",o2:"Nothing",ans:1},
+{q:"Energy refills?",o1:"Yes",o2:"No",ans:1},
+{q:"Invite friends gives?",o1:"Bonus",o2:"Nothing",ans:1},
+{q:"Opposite of Up?",o1:"Down",o2:"Top",ans:1},
+{q:"Moon is?",o1:"Bright",o2:"Dark always",ans:1},
+{q:"Opposite of Good?",o1:"Bad",o2:"Best",ans:1},
+{q:"Cat is cute?",o1:"Yes",o2:"No",ans:1},
+{q:"Fishing is?",o1:"Fun",o2:"Boring",ans:1},
+{q:"EFC is your coin?",o1:"Yes",o2:"No",ans:1},
+{q:"Do you love fishing?",o1:"Yes",o2:"No",ans:1}
+];
 // ===== FIXED REFERRAL & SHARE SYSTEM =====
 function getRefLink(){ return `https://t.me/${BOT_USERNAME}?start=${myId}`; }
 function getShareText(){ return `🎣 Join EFC Fishing Frenzy & Earn EFC!\n🎁 Get 500 EFC Bonus Instant!\n\nPlay Now: ${getRefLink()}`; }
