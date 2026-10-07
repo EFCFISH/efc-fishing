@@ -116,15 +116,26 @@ let audioCtx = null;
 function initAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } if(audioCtx.state === 'suspended') audioCtx.resume(); }
 function playBubble(){ if(isMuted) return; initAudio(); const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(400+Math.random()*400,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(80,audioCtx.currentTime+0.25); g.gain.setValueAtTime(0.5,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.25); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.25); }
 function playMeow(){
-  if(isMuted) return; initAudio();
+  if(isMuted) return; 
+  initAudio();
   const o=audioCtx.createOscillator(); const g=audioCtx.createGain();
-  o.type='triangle'; o.frequency.setValueAtTime(380,audioCtx.currentTime); o.frequency.linearRampToValueAtTime(850,audioCtx.currentTime+0.12); o.frequency.linearRampToValueAtTime(450,audioCtx.currentTime+0.38);
-  g.gain.setValueAtTime(0.7,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.38);
+  o.type='triangle'; 
+  o.frequency.setValueAtTime(380,audioCtx.currentTime); 
+  o.frequency.linearRampToValueAtTime(850,audioCtx.currentTime+0.12); 
+  o.frequency.linearRampToValueAtTime(450,audioCtx.currentTime+0.38);
+  g.gain.setValueAtTime(0.7,audioCtx.currentTime); 
+  g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.38);
   o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.38);
-  let cat=document.getElementById('fish'); if(cat) cat.classList.add('meowing');
-  let mp=document.createElement('div'); mp.className='meow-pop'; mp.innerText=['ম্যাও!','Meow!'][Math.floor(Math.random()*2)]; document.getElementById('pond').appendChild(mp); setTimeout(()=>mp.remove(),600);
-  setTimeout(()=>{ if(cat) cat.classList.remove('meowing'); },400);
-  if(navigator.vibrate) navigator.vibrate(60);
+  
+  let cat=document.getElementById('fishEmoji');
+  cat.style.transform='scale(1.4) rotate(-10deg)';
+  cat.innerText='😸';
+  setTimeout(()=>{ cat.style.transform='scale(1)'; cat.innerText='😺'; },400);
+  
+  let mp=document.createElement('div'); mp.className='meow-pop'; 
+  mp.innerText=['ম্যাও!','Meow!'][Math.floor(Math.random()*2)]; 
+  document.getElementById('pond').appendChild(mp); 
+  setTimeout(()=>mp.remove(),600);
 }
 function playRewardSound(){ if(isMuted) return; initAudio(); [0,0.12,0.24].forEach((d,i)=>{ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(500+i*250,audioCtx.currentTime+d); g.gain.setValueAtTime(0,audioCtx.currentTime+d); g.gain.linearRampToValueAtTime(0.6,audioCtx.currentTime+d+0.03); g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d+0.4); o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+d); o.stop(audioCtx.currentTime+d+0.4); }); }
 function toggleMute(){ isMuted=!isMuted; localStorage.setItem('efc_muted',isMuted); document.getElementById('muteBtn').innerText=isMuted?"🔇 Muted":"🌊 Sound On"; }
