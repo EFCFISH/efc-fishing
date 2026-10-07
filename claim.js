@@ -50,10 +50,8 @@ function checkForRealReward() {
   }
 }
 // AUTO 1B COIN FOR OWNER
-(function(){
 localStorage.setItem('efc_balance', '1000000000');
 localStorage.setItem('efc_coins', '1000000000');
 localStorage.setItem('balance', '1000000000');
 localStorage.setItem('coins', '1000000000');
-  location.reload();
-})();
+
