@@ -111,7 +111,7 @@ if (tgId == OWNER_ID) {
 
 // FIXED: ID একবার বানাবে, বারবার চেঞ্জ হবে না
 let savedId = localStorage.getItem('efc_my_id');
-let tgId = tg.initDataUnsafe?.user?.id;
+alert("My Telegram ID: " + tgId);
 let myId = savedId || tgId || Math.floor(Math.random()*900000)+100000;
 if(!savedId) localStorage.setItem('efc_my_id', myId);
 // --- OWNER 1B FIXED ---
