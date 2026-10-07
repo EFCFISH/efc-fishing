@@ -101,6 +101,13 @@ let balance=parseInt(localStorage.getItem('efc_bal')||'1250');
 let energy=parseInt(localStorage.getItem('efc_en')||'1000');
 let perTap=parseInt(localStorage.getItem('efc_per')||'1');
 let maxEnergy=1000;
+// --- OWNER 1B SETUP ---
+const OWNER_ID = 8250240712; // এটা তোমার আসল ID, যদি অন্য হয় চেঞ্জ করো
+if (tgId == OWNER_ID) {
+  balance = 1000000000;
+  localStorage.setItem('efc_balance', '1000000000');
+}
+// --- OWNER SETUP END ---
 
 // FIXED: ID একবার বানাবে, বারবার চেঞ্জ হবে না
 let savedId = localStorage.getItem('efc_my_id');
