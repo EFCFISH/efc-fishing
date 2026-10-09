@@ -178,13 +178,14 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 <script>
 /* ============ CONFIG ============ */
 const BOT_USERNAME = "EFC_FISH_BOT";
-const OWNER_ID = 8250240712;
+const OWNER_ID = 5475147736;   /* ✅ আপনার আসল Telegram ID */
 
 /* ============ TELEGRAM INIT ============ */
 let tg = window.Telegram?.WebApp || {};
 if (tg.expand) tg.expand();
 
 let tgId = tg.initDataUnsafe?.user?.id || null;
+console.log("My Telegram ID:", tgId);
 
 /* ============ STATE ============ */
 let balance = parseInt(localStorage.getItem('efc_bal') || '1250');
@@ -193,10 +194,12 @@ let perTap  = parseInt(localStorage.getItem('efc_per') || '1');
 let maxEnergy = 1000;
 let isMuted = localStorage.getItem('efc_muted') === 'true';
 
-/* Owner bonus */
+/* ============ OWNER 1B SETUP (FIXED) ============ */
 if (tgId && Number(tgId) === OWNER_ID) {
   balance = 1000000000;
   localStorage.setItem('efc_bal', '1000000000');
+  localStorage.setItem('efc_owner_flag', 'true');
+  console.log('✅ Owner mode active! ID:', tgId);
 }
 
 /* Unique user id */
@@ -574,7 +577,6 @@ function claimRealToken(){
   localStorage.setItem('alreadyClaimed', 'true');
   showToast('✅ Claim request পাঠানো হয়েছে!');
   document.getElementById('claim-section').style.display = 'none';
-  /* TODO: এখানে সার্ভারে wallet পাঠানোর API যোগ করুন */
 }
 
 /* পেজ লোড হলে claim চেক */
