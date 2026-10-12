@@ -397,6 +397,7 @@ function tap(e){
   energy--;
   balance += perTap;
   localStorage.setItem('efc_bal', balance);
+  if (window.saveBalanceToFirestore) window.saveBalanceToFirestore(balance);
   localStorage.setItem('efc_en', energy);
   document.getElementById('bal').innerText = balance;
   updateEnergy(); updateLevel();
@@ -495,7 +496,6 @@ function answerQuiz(c){
     balance += 50;
     document.getElementById('bal').innerText = balance;
     localStorage.setItem('efc_bal', balance);
-    if (window.saveBalanceToFirestore) window.saveBalanceToFirestore(balance);
     updateLevel();
     showToast('✅ +50 EFC');
   } else showToast('❌ Wrong');
