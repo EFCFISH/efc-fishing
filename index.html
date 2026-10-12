@@ -142,7 +142,10 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 <div id="leaderModal">
   <div class="modal-box">
     <h3 style="color:#FFD700">🏆 Leaderboard</h3>
-    <div id="myRankBal" style="color:#FFD700;margin:15px 0;font-size:18px;font-weight:bold">0 EFC</div>
+    <div id="leaderList" style="margin:15px 0;text-align:left">
+      <div style="text-align:center;opacity:0.6;padding:20px">Loading...</div>
+    </div>
+    <div id="myRankBal" style="color:#FFD700;margin:10px 0;font-size:14px;font-weight:bold;padding:10px;background:#0a0e1a;border-radius:10px;border:1px solid #FFD700">Your Rank: --</div>
     <button class="btn-copy" onclick="closeLeaderboard();invite()">👥 INVITE FRIENDS</button>
     <button class="btn-close" onclick="closeLeaderboard()">Close</button>
   </div>
