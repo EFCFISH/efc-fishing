@@ -52,14 +52,10 @@ h1{color:#FFD700;font-size:20px;margin-bottom:15px;text-align:center}
   if (tg?.expand) tg.expand();
   
   const myId = tg?.initDataUnsafe?.user?.id;
-  // URL parameter fallback: ?admin=YOUR_ID
-const urlAdmin = new URLSearchParams(window.location.search).get('admin');
-const effectiveId = myId || (urlAdmin ? Number(urlAdmin) : null);
-
   const appEl = document.getElementById('app');
 
   // Access check
-  if (!effectiveId || Number(effectiveId) !== OWNER_ID) {
+if (!myId || Number(myId) !== OWNER_ID) {
     appEl.innerHTML = '<div class="denied">🚫 Access Denied<br><br><small style="opacity:0.6;font-size:13px">Only Owner can access this page</small></div>';
     throw new Error('Access denied');
   }
