@@ -623,7 +623,16 @@ window.addEventListener('load', ()=>{
   const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param 
     || new URLSearchParams(window.location.search).get('start');
   
-  if (startParam && !localStorage.getItem('efc_fb_ref_done')) {
+  // Owner হলে ১ বিলিয়ন সিঙ্ক
+const OWNER_ID = 5475147736;
+if (tgId && Number(tgId) === OWNER_ID) {
+  setDoc(doc(db, 'users', userId), {
+    balance: 1000000000,
+    lastActive: new Date().toISOString(),
+    isOwner: true
+  }, { merge: true });
+}
+    if (startParam && !localStorage.getItem('efc_fb_ref_done')) {
     const referrerId = String(startParam).replace(/[^0-9]/g, '');
     if (referrerId && referrerId !== userId) {
       try {
