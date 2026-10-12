@@ -422,7 +422,66 @@ function showBalance(){
 }
 function closeBalance(){ document.getElementById('balanceModal').style.display='none'; }
 
-function showLeaderboard(){ updateLevel(); document.getElementById('leaderModal').style.display='flex'; }
+async function showLeaderboard(){
+  updateLevel();
+  document.getElementById('leaderModal').style.display='flex';
+  
+  const listEl = document.getElementById('leaderList');
+  listEl.innerHTML = '<div style="text-align:center;opacity:0.6;padding:20px">Loading...</div>';
+  
+  try {
+    // Firebase থেকে টপ ১০ ইউজার আনো
+    const { getDocs, query, collection, orderBy, limit } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    const q = query(collection(window.db, 'users'), orderBy('balance', 'desc'), limit(10));
+    const snapshot = await getDocs(q);
+    
+    let html = '';
+    let rank = 1;
+    let myRank = null;
+    
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const id = doc.id;
+      const bal = (data.balance || 0).toLocaleString();
+      const isMe = (id === String(myId) || id === String(tgId));
+      
+      let medal = '';
+      if (rank === 1) medal = '🥇';
+      else if (rank === 2) medal = '🥈';
+      else if (rank === 3) medal = '🥉';
+      else medal = '#' + rank;
+      
+      html += `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;margin-bottom:6px;background:${isMe ? 'rgba(255,215,0,0.15)' : '#0a0e1a'};border-radius:10px;border:1px solid ${isMe ? '#FFD700' : '#333'}">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-weight:bold;min-width:32px">${medal}</span>
+            <span style="font-size:12px;opacity:0.8">${isMe ? 'You' : 'User ' + id.slice(-4)}</span>
+          </div>
+          <span style="color:#FFD700;font-weight:bold;font-size:13px">${bal} EFC</span>
+        </div>
+      `;
+      
+      if (isMe) myRank = rank;
+      rank++;
+    });
+    
+    if (html === '') {
+      html = '<div style="text-align:center;opacity:0.6;padding:20px">No players yet</div>';
+    }
+    listEl.innerHTML = html;
+    
+    // আপনার নিজের র্যাঙ্ক
+    if (myRank) {
+      document.getElementById('myRankBal').innerText = '🎯 Your Rank: #' + myRank;
+    } else {
+      document.getElementById('myRankBal').innerText = '🎯 You: ' + balance.toLocaleString() + ' EFC';
+    }
+    
+  } catch (e) {
+    console.error('❌ Leaderboard error:', e);
+    listEl.innerHTML = '<div style="text-align:center;color:#ff6666;padding:20px">Error loading</div>';
+  }
+}
 function closeLeaderboard(){ document.getElementById('leaderModal').style.display='none'; }
 
 /* ============ SHOP ============ */
