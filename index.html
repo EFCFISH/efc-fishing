@@ -663,7 +663,12 @@ window.addEventListener('load', ()=>{
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  window.db = db;   // 👈 এটা যোগ করুন
+window.db = db;
+window.fbGetDocs = getDocs;
+window.fbQuery = query;
+window.fbCollection = collection;
+window.fbOrderBy = orderBy;
+window.fbLimit = limit;
 
   // আপনার Telegram ID দিন
   const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
@@ -694,7 +699,6 @@ window.saveBalanceToFirestore = async function(newBalance) {
     || new URLSearchParams(window.location.search).get('start');
   
   // Owner হলে ১ বিলিয়ন সিঙ্ক
-const OWNER_ID = 5475147736;
 if (tgId && Number(tgId) === OWNER_ID) {
   setDoc(doc(db, 'users', userId), {
     balance: 1000000000,
