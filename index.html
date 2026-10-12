@@ -495,6 +495,7 @@ function answerQuiz(c){
     balance += 50;
     document.getElementById('bal').innerText = balance;
     localStorage.setItem('efc_bal', balance);
+    if (window.saveBalanceToFirestore) window.saveBalanceToFirestore(balance);
     updateLevel();
     showToast('✅ +50 EFC');
   } else showToast('❌ Wrong');
@@ -584,6 +585,65 @@ window.addEventListener('load', ()=>{
   checkForRealReward();
 });
 
+</script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC24K3A3bhXFFT0V0J0MwS5owb5pFUYV9s",
+    authDomain: "efc-fishing-frenzy.firebaseapp.com",
+    projectId: "efc-fishing-frenzy",
+    storageBucket: "efc-fishing-frenzy.firebasestorage.app",
+    messagingSenderId: "720966418548",
+    appId: "1:720966418548:web:24480ef817dcd187329121"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // আপনার Telegram ID দিন
+  const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
+  const userId = tgId ? String(tgId) : 'guest_' + Math.floor(Math.random() * 1000000);
+
+  // ব্যালেন্স Firestore-এ সেভ করার ফাংশন
+  window.saveBalanceToFirestore = async function(newBalance) {
+    try {
+      await setDoc(doc(db, 'users', userId), {
+        balance: newBalance,
+        lastActive: new Date().toISOString()
+      }, { merge: true });
+      console.log('✅ Saved to Firebase:', newBalance);
+    } catch (e) {
+      console.error('❌ Firebase error:', e);
+    }
+  };
+
+  // রেফারেল হ্যান্ডলার
+  const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param 
+    || new URLSearchParams(window.location.search).get('start');
+  
+  if (startParam && !localStorage.getItem('efc_fb_ref_done')) {
+    const referrerId = String(startParam).replace(/[^0-9]/g, '');
+    if (referrerId && referrerId !== userId) {
+      try {
+        // রেফারারের ব্যালেন্স +500
+        await updateDoc(doc(db, 'users', referrerId), {
+          balance: increment(500)
+        });
+        // নতুন ইউজার সেভ
+        await setDoc(doc(db, 'users', userId), {
+          referrer: referrerId,
+          joinedAt: new Date().toISOString(),
+          balance: 1750
+        }, { merge: true });
+        localStorage.setItem('efc_fb_ref_done', 'true');
+        console.log('✅ Referral saved!');
+      } catch (e) {
+        console.error('❌ Referral error:', e);
+      }
+    }
+  }
 </script>
 </body>
 </html>
