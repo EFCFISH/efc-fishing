@@ -663,6 +663,7 @@ window.addEventListener('load', ()=>{
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  window.db = db;   // 👈 এটা যোগ করুন
 
   // আপনার Telegram ID দিন
   const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
