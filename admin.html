@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EFC Admin Panel</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0a0e1a;color:#fff;min-height:100vh;padding:15px;padding-bottom:40px}
+h1{color:#FFD700;font-size:20px;margin-bottom:15px;text-align:center}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.stat{background:#1e2540;border:1px solid #FFD700;border-radius:12px;padding:12px;text-align:center}
+.stat .num{font-size:20px;font-weight:bold;color:#FFD700}
+.stat .lbl{font-size:11px;opacity:0.7;margin-top:4px}
+.search{width:100%;padding:12px;border-radius:10px;border:1px solid #FFD700;background:#1e2540;color:#fff;margin-bottom:12px}
+.user{background:#1e2540;border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid #333}
+.user .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.user .id{font-size:12px;opacity:0.7}
+.user .bal{color:#FFD700;font-weight:bold;font-size:14px}
+.user .date{font-size:10px;opacity:0.5}
+.btn{padding:6px 12px;border:none;border-radius:8px;font-size:11px;font-weight:bold;cursor:pointer;margin-top:6px}
+.btn-edit{background:#FFD700;color:#000}
+.btn-refresh{background:#0088cc;color:#fff;width:100%;padding:12px;font-size:13px;margin-bottom:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+.denied{text-align:center;padding:60px 20px;color:#ff6666;font-size:18px}
+.loading{text-align:center;padding:40px;opacity:0.6}
+.owner-tag{background:#FFD700;color:#000;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:bold;margin-left:6px}
+</style>
+</head>
+<body>
+
+<div id="app"><div class="loading">Loading...</div></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC24K3A3bhXFFT0V0J0MwS5owb5pFUYV9s",
+    authDomain: "efc-fishing-frenzy.firebaseapp.com",
+    projectId: "efc-fishing-frenzy",
+    storageBucket: "efc-fishing-frenzy.firebasestorage.app",
+    messagingSenderId: "720966418548",
+    appId: "1:720966418548:web:24480ef817dcd187329121"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const OWNER_ID = 5475147736;
+  const tg = window.Telegram?.WebApp;
+  if (tg?.expand) tg.expand();
+  
+  const myId = tg?.initDataUnsafe?.user?.id;
+
+  const appEl = document.getElementById('app');
+
+  // Access check
+  if (!myId || Number(myId) !== OWNER_ID) {
+    appEl.innerHTML = '<div class="denied">🚫 Access Denied<br><br><small style="opacity:0.6;font-size:13px">Only Owner can access this page</small></div>';
+    throw new Error('Access denied');
+  }
+
+  let allUsers = [];
+
+  async function loadUsers() {
+    appEl.innerHTML = '<div class="loading">Loading users...</div>';
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      allUsers = [];
+      snap.forEach(d => {
+        allUsers.push({ id: d.id, ...d.data() });
+      });
+      // Sort by balance desc
+      allUsers.sort((a, b) => (b.balance || 0) - (a.balance || 0));
+      render();
+    } catch (e) {
+      appEl.innerHTML = '<div class="denied">Error: ' + e.message + '</div>';
+    }
+  }
+
+  function render(filter = '') {
+    const filtered = filter 
+      ? allUsers.filter(u => u.id.includes(filter))
+      : allUsers;
+
+    const totalBal = allUsers.reduce((s, u) => s + (u.balance || 0), 0);
+    const today = new Date().toISOString().slice(0, 10);
+    const activeToday = allUsers.filter(u => u.lastActive && u.lastActive.startsWith(today)).length;
+
+    let html = `
+      <h1>👑 EFC Admin Panel</h1>
+      <div class="stats">
+        <div class="stat"><div class="num">${allUsers.length}</div><div class="lbl">Total Users</div></div>
+        <div class="stat"><div class="num">${activeToday}</div><div class="lbl">Active Today</div></div>
+        <div class="stat"><div class="num">${(totalBal / 1000000).toFixed(1)}M</div><div class="lbl">Total Balance</div></div>
+        <div class="stat"><div class="num">${OWNER_ID === Number(myId) ? '✓' : '✗'}</div><div class="lbl">Owner</div></div>
+      </div>
+      <button class="btn-refresh" onclick="window.reload()">🔄 Refresh</button>
+      <input class="search" id="searchBox" placeholder="🔍 Search by ID..." value="${filter}" oninput="window.filterUsers(this.value)">
+    `;
+
+    if (filtered.length === 0) {
+      html += '<div class="loading">No users found</div>';
+    } else {
+      filtered.forEach(u => {
+        const isOwner = u.id === String(OWNER_ID);
+        const date = u.lastActive ? u.lastActive.slice(0, 16).replace('T', ' ') : 'never';
+        html += `
+          <div class="user">
+            <div class="row">
+              <span class="id">${u.id}${isOwner ? '<span class="owner-tag">OWNER</span>' : ''}</span>
+              <span class="bal">${(u.balance || 0).toLocaleString()} EFC</span>
+            </div>
+            <div class="date">Last active: ${date}</div>
+            ${u.referrer ? `<div class="date">Referred by: ${u.referrer}</div>` : ''}
+            <button class="btn btn-edit" onclick="window.editBalance('${u.id}', ${u.balance || 0})">✏️ Edit Balance</button>
+          </div>
+        `;
+      });
+    }
+
+    appEl.innerHTML = html;
+
+    // Restore focus to search
+    if (filter) {
+      const s = document.getElementById('searchBox');
+      if (s) { s.focus(); s.setSelectionRange(filter.length, filter.length); }
+    }
+  }
+
+  window.reload = () => loadUsers();
+  window.filterUsers = (v) => render(v);
+  window.editBalance = async (uid, current) => {
+    const val = prompt(`Enter new balance for ${uid}\nCurrent: ${current.toLocaleString()}`, current);
+    if (val === null) return;
+    const newBal = parseInt(val);
+    if (isNaN(newBal)) { alert('Invalid number'); return; }
+    try {
+      await setDoc(doc(db, 'users', uid), { balance: newBal }, { merge: true });
+      alert('✅ Updated!');
+      loadUsers();
+    } catch (e) {
+      alert('❌ Error: ' + e.message);
+    }
+  };
+
+  loadUsers();
+</script>
+</body>
+  </html>
