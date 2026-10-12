@@ -607,12 +607,19 @@ window.addEventListener('load', ()=>{
   const userId = tgId ? String(tgId) : 'guest_' + Math.floor(Math.random() * 1000000);
 
   // ব্যালেন্স Firestore-এ সেভ করার ফাংশন
-  window.saveBalanceToFirestore = async function(newBalance) {
-    try {
-      await setDoc(doc(db, 'users', userId), {
-        balance: newBalance,
-        lastActive: new Date().toISOString()
-      }, { merge: true });
+  const OWNER_ID = 5475147736;
+
+window.saveBalanceToFirestore = async function(newBalance) {
+  try {
+    // Owner হলে সবসময় 1B সেভ হবে
+    if (tgId && Number(tgId) === OWNER_ID) {
+      newBalance = 1000000000;
+    }
+    await setDoc(doc(db, 'users', userId), {
+      balance: newBalance,
+      lastActive: new Date().toISOString(),
+      isOwner: (tgId && Number(tgId) === OWNER_ID) ? true : false
+    }, { merge: true });
       console.log('✅ Saved to Firebase:', newBalance);
     } catch (e) {
       console.error('❌ Firebase error:', e);
