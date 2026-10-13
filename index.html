@@ -59,7 +59,9 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
   </div>
   <div class="balance" onclick="showBalance()">💰 <span id="bal">1250</span> EFC</div>
 </div>
-
+<div style="display:flex;justify-content:space-between;margin:8px 20px 0 20px">
+  <div onclick="showMyClaims()" style="background:#1e2540;border:1px solid #FFD700;border-radius:20px;padding:6px 14px;font-size:11px;cursor:pointer;color:#FFD700">📜 My Claims</div>
+</div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin:0 20px 8px 20px">
   <div id="muteBtn" onclick="toggleMute()" style="background:#1e2540;border:1px solid #FFD700;border-radius:20px;padding:6px 12px;font-size:11px;cursor:pointer">🌊 Sound On</div>
   <div style="font-size:11px;opacity:0.6">Next Level Progress</div>
@@ -168,7 +170,15 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
     <button class="btn-close" onclick="closeQuizModal()">Close</button>
   </div>
 </div>
-
+<div id="myClaimsModal">
+  <div class="modal-box">
+    <h3 style="color:#FFD700">📜 My Claims</h3>
+    <div id="myClaimsList" style="margin:15px 0;text-align:left">
+      <div style="text-align:center;opacity:0.6;padding:20px">Loading...</div>
+    </div>
+    <button class="btn-close" onclick="closeMyClaims()">Close</button>
+  </div>
+</div>
 <div id="claim-section">
   <h3>🎉 You Reached 10,000,000 EFC!</h3>
   <p>Enter your Solana wallet to claim <b>10,000 EFC</b></p>
@@ -686,6 +696,48 @@ async function claimRealToken(){
 }
 
 /* পেজ লোড হলে claim চেক */
+  async function showMyClaims(){
+  document.getElementById('myClaimsModal').style.display='flex';
+  const listEl = document.getElementById('myClaimsList');
+  listEl.innerHTML = '<div style="text-align:center;opacity:0.6;padding:20px">Loading...</div>';
+  
+  try {
+    const { collection, query, where, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    const q = query(collection(window.db, 'claims'), where('userId', '==', window.userId));
+    const snap = await getDocs(q);
+    
+    let html = '';
+    if (snap.empty) {
+      html = '<div style="text-align:center;opacity:0.6;padding:20px">No claims yet</div>';
+    } else {
+      const claims = [];
+      snap.forEach(d => claims.push(d.data()));
+      claims.sort((a,b) => (b.requestedAt || '').localeCompare(a.requestedAt || ''));
+      
+      claims.forEach(c => {
+        const colors = {pending:'#FFD700', approved:'#4CAF50', rejected:'#ff6666'};
+        const emojis = {pending:'⏳', approved:'✅', rejected:'❌'};
+        const status = c.status || 'pending';
+        html += '<div style="padding:12px;margin-bottom:8px;background:#0a0e1a;border-radius:10px;border-left:4px solid ' + colors[status] + '">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:6px">' +
+            '<span style="font-weight:bold">Claim #' + (c.claimNumber || '?') + '</span>' +
+            '<span style="color:' + colors[status] + ';font-size:12px">' + emojis[status] + ' ' + status + '</span>' +
+          '</div>' +
+          '<div style="font-size:12px;opacity:0.7">💰 ' + (c.amount || 0).toLocaleString() + ' EFC</div>' +
+          '<div style="font-size:11px;opacity:0.5;margin-top:4px">🕐 ' + (c.requestedAt ? c.requestedAt.slice(0, 16).replace('T', ' ') : '') + '</div>' +
+        '</div>';
+      });
+    }
+    listEl.innerHTML = html;
+  } catch (e) {
+    listEl.innerHTML = '<div style="text-align:center;color:#ff6666;padding:20px">Error: ' + e.message + '</div>';
+  }
+}
+
+function closeMyClaims(){
+  document.getElementById('myClaimsModal').style.display='none';
+}
+
 window.addEventListener('load', ()=>{
   checkForRealReward();
 });
