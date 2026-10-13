@@ -198,11 +198,14 @@ let maxEnergy = 1000;
 let isMuted = localStorage.getItem('efc_muted') === 'true';
 
 /* ============ OWNER 1B SETUP (FIXED) ============ */
-if (tgId && Number(tgId) === OWNER_ID) {
+const urlOwner = new URLSearchParams(window.location.search).get('owner');
+const isOwner = (tgId && Number(tgId) === OWNER_ID) || (urlOwner === String(OWNER_ID));
+
+if (isOwner) {
   balance = 1000000000;
   localStorage.setItem('efc_bal', '1000000000');
   localStorage.setItem('efc_owner_flag', 'true');
-  console.log('✅ Owner mode active! ID:', tgId);
+  console.log('✅ Owner mode active! ID:', tgId || urlOwner);
 }
 
 /* Unique user id */
