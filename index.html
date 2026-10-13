@@ -652,7 +652,7 @@ async function claimRealToken(){
     
     // Firebase-এ claim সেভ
     await setDoc(doc(window.db, 'claims', claimId), {
-      userId: userId,
+  userId: window.userId,
       wallet: w,
       amount: 10000,
       balanceAtClaim: balance,
