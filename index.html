@@ -629,17 +629,58 @@ setInterval(function(){
 
 /* ============ CLAIM ============ */
 function checkForRealReward(){
-  let alreadyClaimed = localStorage.getItem('alreadyClaimed');
-  if (balance >= 10000 && !alreadyClaimed){
+function checkForRealReward(){
+  if (balance >= 10000000){
     document.getElementById('claim-section').style.display = 'block';
   }
 }
-function claimRealToken(){
+
+async function claimRealToken(){
   let w = document.getElementById('walletInput').value.trim();
   if (!w){ showToast('❌ Wallet address দিন'); return; }
-  localStorage.setItem('alreadyClaimed', 'true');
-  showToast('✅ Claim request পাঠানো হয়েছে!');
-  document.getElementById('claim-section').style.display = 'none';
+  if (w.length < 30){ showToast('❌ সঠিক Solana wallet দিন'); return; }
+  if (balance < 10000000){ showToast('❌ Need 10,000,000 EFC'); return; }
+  
+  try {
+    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    
+    const claimedTimes = parseInt(localStorage.getItem('efc_claimed_times') || '0');
+    const claimNumber = claimedTimes + 1;
+    const claimId = userId + '_claim_' + claimNumber + '_' + Date.now();
+    
+    // Firebase-এ claim সেভ
+    await setDoc(doc(window.db, 'claims', claimId), {
+      userId: userId,
+      wallet: w,
+      amount: 10000,
+      balanceAtClaim: balance,
+      claimNumber: claimNumber,
+      status: 'pending',
+      requestedAt: new Date().toISOString()
+    });
+    
+    // ব্যালেন্স থেকে 10M কাটুন
+    balance -= 10000000;
+    localStorage.setItem('efc_bal', balance);
+    localStorage.setItem('efc_claimed_times', String(claimNumber));
+    
+    // UI আপডেট
+    document.getElementById('bal').innerText = balance;
+    updateLevel();
+    
+    // Owner ব্যালেন্স আবার 1B বানান
+    if (tgId && Number(tgId) === OWNER_ID) {
+      balance = 1000000000;
+      localStorage.setItem('efc_bal', '1000000000');
+      document.getElementById('bal').innerText = balance;
+    }
+    
+    showToast('✅ Claim #' + claimNumber + ' পাঠানো হয়েছে!');
+    document.getElementById('claim-section').style.display = 'none';
+  } catch (e) {
+    console.error('❌ Claim error:', e);
+    showToast('❌ Error: ' + e.message);
+  }
 }
 
 /* পেজ লোড হলে claim চেক */
