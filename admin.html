@@ -144,7 +144,12 @@ if (allClaims.length === 0) {
       '<div class="date">💰 Amount: ' + (c.amount || 0).toLocaleString() + ' EFC</div>' +
       '<div class="date" style="margin-top:4px;word-break:break-all">🔑 Wallet: ' + (c.wallet || 'N/A') + '</div>' +
       '<div class="date">🕐 ' + (c.requestedAt ? c.requestedAt.slice(0, 19).replace('T', ' ') : 'N/A') + '</div>' +
-      (c.claimNumber ? '<div class="date">🎯 Claim #' + c.claimNumber + '</div>' : '') +
+            (c.claimNumber ? '<div class="date">🎯 Claim #' + c.claimNumber + '</div>' : '') +
+      (c.status === 'pending' ?
+        '<div style="display:flex;gap:8px;margin-top:10px">' +
+          '<button class="btn" style="background:#4CAF50;color:#fff;flex:1;padding:10px" onclick="window.approveClaim(\'' + c.id + '\')">✅ Approve</button>' +
+          '<button class="btn" style="background:#ff6666;color:#fff;flex:1;padding:10px" onclick="window.rejectClaim(\'' + c.id + '\')">❌ Reject</button>' +
+        '</div>' : '') +
     '</div>';
   });
 }
@@ -160,6 +165,30 @@ appEl.innerHTML = html;
 
   window.reload = () => loadUsers();
   window.filterUsers = (v) => render(v);
+  window.approveClaim = async (claimId) => {
+  if (!confirm('Approve this claim?')) return;
+  try {
+    await setDoc(doc(db, 'claims', claimId), {
+      status: 'approved',
+      approvedAt: new Date().toISOString()
+    }, { merge: true });
+    alert('✅ Approved!');
+    loadUsers();
+  } catch (e) { alert('❌ ' + e.message); }
+};
+
+window.rejectClaim = async (claimId) => {
+  if (!confirm('Reject this claim?')) return;
+  try {
+    await setDoc(doc(db, 'claims', claimId), {
+      status: 'rejected',
+      rejectedAt: new Date().toISOString()
+    }, { merge: true });
+    alert('❌ Rejected');
+    loadUsers();
+  } catch (e) { alert('❌ ' + e.message); }
+};
+
   window.editBalance = async (uid, current) => {
     const val = prompt(`Enter new balance for ${uid}\nCurrent: ${current.toLocaleString()}`, current);
     if (val === null) return;
