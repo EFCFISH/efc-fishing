@@ -60,23 +60,32 @@ if (!myId || Number(myId) !== OWNER_ID) {
     throw new Error('Access denied');
   }
 
-  let allUsers = [];
+let allUsers = [];
+let allClaims = [];
 
   async function loadUsers() {
-    appEl.innerHTML = '<div class="loading">Loading users...</div>';
-    try {
-      const snap = await getDocs(collection(db, 'users'));
-      allUsers = [];
-      snap.forEach(d => {
-        allUsers.push({ id: d.id, ...d.data() });
-      });
-      // Sort by balance desc
-      allUsers.sort((a, b) => (b.balance || 0) - (a.balance || 0));
-      render();
-    } catch (e) {
-      appEl.innerHTML = '<div class="denied">Error: ' + e.message + '</div>';
-    }
+  appEl.innerHTML = '<div class="loading">Loading...</div>';
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    allUsers = [];
+    snap.forEach(d => {
+      allUsers.push({ id: d.id, ...d.data() });
+    });
+    allUsers.sort((a, b) => (b.balance || 0) - (a.balance || 0));
+
+    // Claims লোড
+    const claimsSnap = await getDocs(collection(db, 'claims'));
+    allClaims = [];
+    claimsSnap.forEach(d => {
+      allClaims.push({ id: d.id, ...d.data() });
+    });
+    allClaims.sort((a, b) => (b.requestedAt || '').localeCompare(a.requestedAt || ''));
+
+    render();
+  } catch (e) {
+    appEl.innerHTML = '<div class="denied">Error: ' + e.message + '</div>';
   }
+}
 
   function render(filter = '') {
     const filtered = filter 
@@ -118,8 +127,29 @@ if (!myId || Number(myId) !== OWNER_ID) {
         `;
       });
     }
+// Claims Section
+html += '<h2 style="color:#FFD700;font-size:16px;margin:20px 0 10px;text-align:center">💰 Claim Requests (' + allClaims.length + ')</h2>';
 
-    appEl.innerHTML = html;
+if (allClaims.length === 0) {
+  html += '<div class="loading">No claims yet</div>';
+} else {
+  allClaims.forEach(c => {
+    const statusColor = c.status === 'pending' ? '#FFD700' : c.status === 'approved' ? '#4CAF50' : '#ff6666';
+    const statusEmoji = c.status === 'pending' ? '⏳' : c.status === 'approved' ? '✅' : '❌';
+    html += '<div class="user">' +
+      '<div class="row">' +
+        '<span class="id">' + c.userId + '</span>' +
+        '<span style="color:' + statusColor + ';font-weight:bold;font-size:12px">' + statusEmoji + ' ' + (c.status || 'pending') + '</span>' +
+      '</div>' +
+      '<div class="date">💰 Amount: ' + (c.amount || 0).toLocaleString() + ' EFC</div>' +
+      '<div class="date" style="margin-top:4px;word-break:break-all">🔑 Wallet: ' + (c.wallet || 'N/A') + '</div>' +
+      '<div class="date">🕐 ' + (c.requestedAt ? c.requestedAt.slice(0, 19).replace('T', ' ') : 'N/A') + '</div>' +
+      (c.claimNumber ? '<div class="date">🎯 Claim #' + c.claimNumber + '</div>' : '') +
+    '</div>';
+  });
+}
+
+appEl.innerHTML = html;
 
     // Restore focus to search
     if (filter) {
