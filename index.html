@@ -632,7 +632,6 @@ setInterval(function(){
 
 /* ============ CLAIM ============ */
 function checkForRealReward(){
-function checkForRealReward(){
   if (balance >= 10000000){
     document.getElementById('claim-section').style.display = 'block';
   }
@@ -649,7 +648,7 @@ async function claimRealToken(){
     
     const claimedTimes = parseInt(localStorage.getItem('efc_claimed_times') || '0');
     const claimNumber = claimedTimes + 1;
-    const claimId = userId + '_claim_' + claimNumber + '_' + Date.now();
+    const claimId = window.userId + '_claim_' + claimNumber + '_' + Date.now();
     
     // Firebase-এ claim সেভ
     await setDoc(doc(window.db, 'claims', claimId), {
@@ -694,8 +693,7 @@ window.addEventListener('load', ()=>{
 </script>
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+  import { getFirestore, doc, setDoc, updateDoc, increment, getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   const firebaseConfig = {
     apiKey: "AIzaSyC24K3A3bhXFFT0V0J0MwS5owb5pFUYV9s",
     authDomain: "efc-fishing-frenzy.firebaseapp.com",
@@ -717,7 +715,7 @@ window.fbLimit = limit;
   // আপনার Telegram ID দিন
   const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
   const userId = tgId ? String(tgId) : 'guest_' + Math.floor(Math.random() * 1000000);
-
+window.userId = userId;
   // ব্যালেন্স Firestore-এ সেভ করার ফাংশন
   const OWNER_ID = 5475147736;
 
