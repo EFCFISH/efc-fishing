@@ -91,11 +91,12 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 </div>
 
 <div class="shop">
-  <div class="card">
-    <div style="font-size:30px">🪝</div><b>Iron Rod</b><br>
-    <small>2x Earning</small>
-    <button onclick="buyRod()">500 EFC - BUY</button>
-  </div>
+  <div class="card" id="rodCard">
+  <div style="font-size:30px" id="rodIcon">🪝</div>
+  <b id="rodName">Iron Rod</b><br>
+  <small id="rodMulti">2x Earning</small>
+  <button onclick="buyRod()" id="rodBtn">500 EFC - BUY</button>
+</div>
   <div class="card" onclick="showLeaderboard()" style="cursor:pointer">
     <div style="font-size:30px">🏆</div><b>Leaderboard</b><br>
     <small id="miniRank">You: #1</small>
@@ -499,17 +500,71 @@ async function showLeaderboard(){
 function closeLeaderboard(){ document.getElementById('leaderModal').style.display='none'; }
 
 /* ============ SHOP ============ */
+const RODS = [
+  { id: 0, icon: '🪝', name: 'Iron Rod',      price: 500,        multi: 2 },
+  { id: 1, icon: '🥈', name: 'Silver Rod',    price: 5000,       multi: 5 },
+  { id: 2, icon: '🥇', name: 'Gold Rod',      price: 50000,      multi: 10 },
+  { id: 3, icon: '💎', name: 'Diamond Rod',   price: 500000,     multi: 25 },
+  { id: 4, icon: '🔱', name: 'Legendary Rod', price: 5000000,    multi: 50 },
+  { id: 5, icon: '👑', name: 'Mythic Rod',    price: 50000000,   multi: 100 }
+];
+
+let currentRod = parseInt(localStorage.getItem('efc_rod') || '0');
+perTap = RODS[currentRod].multi;
+
+function updateRodUI(){
+  const rod = RODS[currentRod];
+  const nextRod = RODS[currentRod + 1];
+  
+  document.getElementById('rodIcon').innerText = rod.icon;
+  document.getElementById('rodName').innerText = rod.name;
+  document.getElementById('rodMulti').innerText = rod.multi + 'x Earning';
+  
+  const btn = document.getElementById('rodBtn');
+  if (!nextRod){
+    btn.innerText = '👑 MAX ROD';
+    btn.style.background = '#4CAF50';
+    btn.style.color = '#fff';
+    btn.disabled = true;
+  } else {
+    btn.innerText = nextRod.price.toLocaleString() + ' EFC - UPGRADE';
+    btn.disabled = false;
+    btn.style.background = '#FFD700';
+    btn.style.color = '#000';
+  }
+}
+
 function buyRod(){
-  if (balance >= 500){
+  const nextRod = RODS[currentRod + 1];
+  if (!nextRod){
+    showToast('👑 Already MAX rod!');
+    return;
+  }
+  if (balance >= nextRod.price){
     playRewardSound();
-    balance -= 500; perTap = 2;
+    balance -= nextRod.price;
+    currentRod++;
+    perTap = RODS[currentRod].multi;
+    
     localStorage.setItem('efc_bal', balance);
     localStorage.setItem('efc_per', perTap);
+    localStorage.setItem('efc_rod', currentRod);
+    
     document.getElementById('bal').innerText = balance;
     updateLevel();
-    showAppModal('Unlocked! 🎣', 'Iron Rod 2x!');
-  } else showToast('❌ Need 500 EFC!');
+    updateRodUI();
+    
+    if (window.saveBalanceToFirestore) window.saveBalanceToFirestore(balance);
+    if (window.saveRodToFirestore) window.saveRodToFirestore(currentRod);
+    
+    showAppModal('Unlocked! 🎣', RODS[currentRod].name + ' — ' + perTap + 'x Earning!');
+  } else {
+    showToast('❌ Need ' + nextRod.price.toLocaleString() + ' EFC!');
+  }
 }
+
+// পেজ লোডে UI আপডেট
+updateRodUI();
 
 /* ============ QUIZ ============ */
 let currentQuiz = null;
@@ -773,6 +828,17 @@ window.userId = userId;
   const OWNER_ID = 5475147736;
 
 window.saveBalanceToFirestore = async function(newBalance) {
+  window.saveRodToFirestore = async function(rod) {
+  try {
+    await setDoc(doc(db, 'users', userId), {
+      rod: rod,
+      lastActive: new Date().toISOString()
+    }, { merge: true });
+    console.log('✅ Rod saved:', rod);
+  } catch (e) {
+    console.error('❌ Rod error:', e);
+  }
+};
   try {
     // Owner হলে সবসময় 1B সেভ হবে
     if (tgId && Number(tgId) === OWNER_ID) {
