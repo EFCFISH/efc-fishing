@@ -624,11 +624,12 @@ function showQuiz(){
 }
 function answerQuiz(c){
   if (c == currentQuiz[3]){
-    balance += 50;
-    document.getElementById('bal').innerText = balance;
-    localStorage.setItem('efc_bal', balance);
-    updateLevel();
-    showToast('✅ +50 EFC');
+    balance += 5000;
+document.getElementById('bal').innerText = balance;
+localStorage.setItem('efc_bal', balance);
+if (window.saveBalanceToFirestore) window.saveBalanceToFirestore(balance);
+updateLevel();
+showToast('✅ +5,000 EFC');
   } else showToast('❌ Wrong');
   document.getElementById('quizModal').style.display='none';
   setActive('navFish');
