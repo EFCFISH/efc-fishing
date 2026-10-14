@@ -641,7 +641,7 @@ function closeQuizModal(){
 
 /* ============ REFERRAL & SHARE ============ */
 function getRefLink(){ return `https://t.me/${BOT_USERNAME}?start=${myId}`; }
-function getShareText(){ return `🎣 Join EFC Fishing Frenzy & Earn EFC!\n🎁 Get 500 EFC Bonus Instant!\n\nPlay Now: ${getRefLink()}`; }
+function getShareText(){ return `🎣 Join EFC Fishing Frenzy & Earn EFC!\n🎁 Get 50000 EFC Bonus Instant!\n\nPlay Now: ${getRefLink()}`; }
 
 function invite(){
   setActive('navFriends');
@@ -675,7 +675,7 @@ function shareOn(platform){
   let encLink = encodeURIComponent(link);
 
   if (platform==='telegram'){
-    window.open(`https://t.me/share/url?url=${encLink}&text=${encodeURIComponent('🎣 Join EFC Fishing & Get 500 EFC Bonus!')}`,'_blank');
+    window.open(`https://t.me/share/url?url=${encLink}&text=${encodeURIComponent('🎣 Join EFC Fishing & Get 50000 EFC Bonus!')}`,'_blank');
   } else if (platform==='whatsapp'){
     window.open(`https://wa.me/?text=${encText}`,'_blank');
   } else if (platform==='messenger'){
