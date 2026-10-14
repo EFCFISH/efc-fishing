@@ -875,7 +875,6 @@ if (tgId && Number(tgId) === OWNER_ID) {
         await updateDoc(doc(db, 'users', referrerId), {
   balance: increment(50000)
 });
-        });
         // নতুন ইউজার সেভ
         await setDoc(doc(db, 'users', userId), {
   referrer: referrerId,
