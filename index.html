@@ -48,6 +48,7 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
 #claim-section input{width:90%;padding:12px;border-radius:8px;border:none;margin-top:10px}
 #claim-section button{margin-top:15px;padding:12px 25px;background:gold;color:black;font-weight:bold;border:none;border-radius:8px;cursor:pointer;width:100%}
 #myClaimsModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px}
+#earnModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:20px}
 </style>
 </head>
 <body>
@@ -172,6 +173,44 @@ body{background:#0a0e1a;color:#fff;min-height:100vh;padding-bottom:100px;overflo
     <button class="btn-close" onclick="closeQuizModal()">Close</button>
   </div>
 </div>
+  <div id="earnModal">
+  <div class="modal-box">
+    <h3 style="color:#FFD700">🎁 Earn EFC</h3>
+    <p style="font-size:12px;opacity:0.7;margin-top:6px">Complete tasks and earn rewards</p>
+    
+    <div id="task_twitter" style="margin-top:15px;background:#0a0e1a;border:1px solid #FFD700;border-radius:12px;padding:12px;text-align:left">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:bold;font-size:14px">🐦 Follow Twitter</div>
+          <div style="font-size:11px;opacity:0.7;margin-top:2px">Earn <b style="color:#FFD700">100,000 EFC</b></div>
+        </div>
+        <button id="btn_twitter" onclick="doTask('twitter')" style="background:#1DA1F2;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;font-size:11px;cursor:pointer">GO</button>
+      </div>
+    </div>
+    
+    <div id="task_telegram" style="margin-top:10px;background:#0a0e1a;border:1px solid #FFD700;border-radius:12px;padding:12px;text-align:left">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:bold;font-size:14px">✈️ Join Telegram</div>
+          <div style="font-size:11px;opacity:0.7;margin-top:2px">Earn <b style="color:#FFD700">50,000 EFC</b></div>
+        </div>
+        <button id="btn_telegram" onclick="doTask('telegram')" style="background:#0088cc;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;font-size:11px;cursor:pointer">GO</button>
+      </div>
+    </div>
+    
+    <div id="task_twitterpost" style="margin-top:10px;background:#0a0e1a;border:1px solid #FFD700;border-radius:12px;padding:12px;text-align:left">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:bold;font-size:14px">📝 Post on Twitter</div>
+          <div style="font-size:11px;opacity:0.7;margin-top:2px">Earn <b style="color:#FFD700">50,000 EFC</b></div>
+        </div>
+        <button id="btn_twitterpost" onclick="doTask('twitterpost')" style="background:#1DA1F2;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;font-size:11px;cursor:pointer">GO</button>
+      </div>
+    </div>
+    
+    <button class="btn-close" onclick="closeEarn()">Close</button>
+  </div>
+  </div>
 <div id="myClaimsModal">
   <div class="modal-box">
     <h3 style="color:#FFD700">📜 My Claims</h3>
@@ -370,7 +409,72 @@ function setActive(id){
   document.getElementById(id)?.classList.add('active');
 }
 function showFish(){ setActive('navFish'); }
-function earn(){ setActive('navEarn'); }
+function earn(){ 
+  setActive('navEarn');
+  document.getElementById('earnModal').style.display = 'flex';
+  updateTasksUI();
+}
+
+function closeEarn(){
+  document.getElementById('earnModal').style.display = 'none';
+  setActive('navFish');
+}
+
+function updateTasksUI(){
+  const tasks = JSON.parse(localStorage.getItem('efc_tasks') || '{}');
+  
+  if (tasks.twitter){
+    document.getElementById('btn_twitter').innerText = '✅ Done';
+    document.getElementById('btn_twitter').style.background = '#4CAF50';
+    document.getElementById('btn_twitter').disabled = true;
+    document.getElementById('task_twitter').style.opacity = '0.6';
+  }
+  if (tasks.telegram){
+    document.getElementById('btn_telegram').innerText = '✅ Done';
+    document.getElementById('btn_telegram').style.background = '#4CAF50';
+    document.getElementById('btn_telegram').disabled = true;
+    document.getElementById('task_telegram').style.opacity = '0.6';
+  }
+  if (tasks.twitterpost){
+    document.getElementById('btn_twitterpost').innerText = '✅ Done';
+    document.getElementById('btn_twitterpost').style.background = '#4CAF50';
+    document.getElementById('btn_twitterpost').disabled = true;
+    document.getElementById('task_twitterpost').style.opacity = '0.6';
+  }
+}
+
+function doTask(taskName){
+  const tasks = JSON.parse(localStorage.getItem('efc_tasks') || '{}');
+  if (tasks[taskName]){ showToast('✅ Already done!'); return; }
+  
+  const config = {
+    twitter:     { url: 'https://x.com/EnglishFishCoin', reward: 100000 },
+    telegram:    { url: 'https://t.me/EFC_FISH_BOT', reward: 50000 },
+    twitterpost: { url: 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('🎣 Playing EFC Fishing Frenzy! Join now 👉 https://t.me/EFC_FISH_BOT?start=5475147736'), reward: 50000 }
+  };
+  
+  const c = config[taskName];
+  if (!c) return;
+  
+  window.open(c.url, '_blank');
+  
+  setTimeout(() => {
+    tasks[taskName] = true;
+    localStorage.setItem('efc_tasks', JSON.stringify(tasks));
+    
+    balance += c.reward;
+    localStorage.setItem('efc_bal', balance);
+    document.getElementById('bal').innerText = balance;
+    
+    if (window.saveBalanceToFirestore) window.saveBalanceToFirestore(balance);
+    if (window.saveTasksToFirestore) window.saveTasksToFirestore(tasks);
+    
+    updateLevel();
+    updateTasksUI();
+    playRewardSound();
+    showToast('✅ +' + c.reward.toLocaleString() + ' EFC');
+  }, 5000);
+}
 
 /* ============ FISH SPAWN ============ */
 function spawnFish(){
