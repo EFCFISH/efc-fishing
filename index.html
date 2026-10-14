@@ -240,6 +240,11 @@ if (tg.expand) tg.expand();
 
 let tgId = tg.initDataUnsafe?.user?.id || null;
 console.log("My Telegram ID:", tgId);
+/* Task Reset (একবারই) */
+if (localStorage.getItem('efc_reset_v4') !== 'done') {
+  localStorage.removeItem('efc_tasks');
+  localStorage.setItem('efc_reset_v4', 'done');
+}
 
 /* ============ STATE ============ */
 let balance = parseInt(localStorage.getItem('efc_bal') || '1250');
@@ -449,7 +454,7 @@ function doTask(taskName){
   
   const config = {
     twitter:     { url: 'https://x.com/EnglishFishCoin', reward: 100000 },
-    telegram:    { url: 'https://t.me/EFC_FISH_BOT', reward: 50000 },
+    telegram:    { url: 'https://t.me/EFCSOL', reward: 50000 },
     twitterpost: { url: 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('🎣 Playing EFC Fishing Frenzy! Join now 👉 https://t.me/EFC_FISH_BOT?start=5475147736'), reward: 50000 }
   };
   
