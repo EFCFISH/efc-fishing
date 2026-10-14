@@ -307,13 +307,13 @@ function closeAppModal(){ document.getElementById('appModal').style.display='non
 if (startParam && !localStorage.getItem('efc_ref_claimed')) {
   let refId = String(startParam).replace(/[^0-9]/g,'');
   if (refId && refId !== String(myId)) {
-    balance += 500;
+    balance += 50000;
     localStorage.setItem('efc_bal', balance);
     localStorage.setItem('efc_ref_claimed', 'true');
     localStorage.setItem('efc_referred_by', refId);
     setTimeout(()=>{
       playRewardSound();
-      showAppModal('Welcome Bonus! 🎉', 'Referral Bonus +500 EFC! Ref: '+refId);
+      showAppModal('Welcome Bonus! 🎉', 'Referral Bonus +50,000 EFC! Ref: '+refId);
       document.getElementById('bal').innerText = balance;
       updateLevel();
     }, 800);
@@ -826,9 +826,7 @@ window.fbLimit = limit;
 window.userId = userId;
   // ব্যালেন্স Firestore-এ সেভ করার ফাংশন
   const OWNER_ID = 5475147736;
-
-window.saveBalanceToFirestore = async function(newBalance) {
-  window.saveRodToFirestore = async function(rod) {
+window.saveRodToFirestore = async function(rod) {
   try {
     await setDoc(doc(db, 'users', userId), {
       rod: rod,
@@ -839,6 +837,8 @@ window.saveBalanceToFirestore = async function(newBalance) {
     console.error('❌ Rod error:', e);
   }
 };
+
+window.saveBalanceToFirestore = async function(newBalance) {
   try {
     // Owner হলে সবসময় 1B সেভ হবে
     if (tgId && Number(tgId) === OWNER_ID) {
@@ -871,16 +871,17 @@ if (tgId && Number(tgId) === OWNER_ID) {
     const referrerId = String(startParam).replace(/[^0-9]/g, '');
     if (referrerId && referrerId !== userId) {
       try {
-        // রেফারারের ব্যালেন্স +500
+        // রেফারারের ব্যালেন্স +50000
         await updateDoc(doc(db, 'users', referrerId), {
-          balance: increment(500)
+  balance: increment(50000)
+});
         });
         // নতুন ইউজার সেভ
         await setDoc(doc(db, 'users', userId), {
-          referrer: referrerId,
-          joinedAt: new Date().toISOString(),
-          balance: 1750
-        }, { merge: true });
+  referrer: referrerId,
+  joinedAt: new Date().toISOString(),
+  balance: 51750
+}, { merge: true });
         localStorage.setItem('efc_fb_ref_done', 'true');
         console.log('✅ Referral saved!');
       } catch (e) {
