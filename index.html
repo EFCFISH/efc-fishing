@@ -942,6 +942,17 @@ window.saveRodToFirestore = async function(rod) {
     console.error('❌ Rod error:', e);
   }
 };
+window.saveTasksToFirestore = async function(tasks) {
+  try {
+    await setDoc(doc(db, 'users', userId), {
+      tasks: tasks,
+      lastActive: new Date().toISOString()
+    }, { merge: true });
+    console.log('✅ Tasks saved:', tasks);
+  } catch (e) {
+    console.error('❌ Tasks error:', e);
+  }
+};
 
 window.saveBalanceToFirestore = async function(newBalance) {
   try {
